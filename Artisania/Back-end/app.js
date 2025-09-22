@@ -21,13 +21,22 @@ app.use(express.urlencoded({ extended: true }));
 
 // Import routes
 const authRoutes = require('./routes/auth');
+const productRoutes = require('./routes/product');
+const shopRoutes = require('./routes/shop');
+const orderRoutes = require('./routes/order');
 
 // Routes
 app.get('/', (req, res) => {
   res.json({ 
     message: 'Welcome to Artisania API',
     version: '1.0.0',
-    status: 'Server is running'
+    status: 'Server is running',
+    endpoints: {
+      auth: '/api/auth',
+      products: '/api/products',
+      shops: '/api/shops',
+      orders: '/api/orders'
+    }
   });
 });
 
@@ -35,12 +44,17 @@ app.get('/', (req, res) => {
 app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'OK',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: process.memoryUsage()
   });
 });
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/shops', shopRoutes);
+app.use('/api/orders', orderRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
