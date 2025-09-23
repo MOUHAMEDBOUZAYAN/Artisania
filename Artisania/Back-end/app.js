@@ -24,6 +24,7 @@ const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/product');
 const shopRoutes = require('./routes/shop');
 const orderRoutes = require('./routes/order');
+const userRoutes = require('./routes/user');
 
 // Routes
 app.get('/', (req, res) => {
@@ -35,7 +36,8 @@ app.get('/', (req, res) => {
       auth: '/api/auth',
       products: '/api/products',
       shops: '/api/shops',
-      orders: '/api/orders'
+      orders: '/api/orders',
+      users: '/api/users'
     }
   });
 });
@@ -55,6 +57,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/shops', shopRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/users', userRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -1,176 +1,279 @@
-# Artisania Backend API
+# 🎨 Artisania Backend API
 
-API REST pour la plateforme Artisania - Marketplace d'artisanat.
+## 📋 Overview
+Complete backend API for Artisania marketplace - a platform connecting artisans with customers for authentic handmade products.
 
-## 🚀 Technologies utilisées
+## 🚀 Quick Start
 
-- **Node.js** + **Express.js** - Serveur web
-- **MongoDB** + **Mongoose** - Base de données
-- **JWT** - Authentification
-- **Bcrypt** - Hachage des mots de passe
-- **Express-validator** - Validation des données
+### Prerequisites
+- Node.js (v16 or higher)
+- MongoDB (v5 or higher)
+- npm or yarn
 
-## 📦 Installation
-
-1. **Installer les dépendances :**
+### Installation
 ```bash
+# Install dependencies
 npm install
-```
 
-2. **Configurer les variables d'environnement :**
-```bash
-cp env.example .env
-```
+# Copy environment file
+cp .env.example .env
 
-3. **Démarrer MongoDB :**
-```bash
-# Local MongoDB
-mongod
-
-# Ou utiliser MongoDB Atlas
-```
-
-4. **Démarrer le serveur de développement :**
-```bash
+# Start development server
 npm run dev
 ```
 
-## 🔧 Configuration
-
-### Variables d'environnement
-
-Copiez `env.example` vers `.env` et configurez :
+### Environment Variables
+Create a `.env` file in the root directory:
 
 ```env
-# Base de données
+# Database Configuration
 MONGODB_URI=mongodb://localhost:27017/artisania
 
-# JWT
-JWT_SECRET=your_secret_key
+# JWT Configuration
+JWT_SECRET=your_jwt_secret_here
 JWT_EXPIRE=7d
 
-# Serveur
+# Server Configuration
 PORT=5000
 NODE_ENV=development
 
-# CORS
+# CORS Configuration
 FRONTEND_URL=http://localhost:3000
 ```
 
 ## 📚 API Endpoints
 
 ### 🔐 Authentication
-- `POST /api/auth/register` - Inscription
-- `POST /api/auth/login` - Connexion
-- `GET /api/auth/me` - Profil utilisateur
-- `POST /api/auth/logout` - Déconnexion
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|---------|
+| POST | `/api/auth/register` | Register new user | Public |
+| POST | `/api/auth/login` | User login | Public |
+| GET | `/api/auth/me` | Get current user profile | Private |
+| POST | `/api/auth/logout` | User logout | Private |
 
 ### 🛍️ Products
-- `GET /api/products` - Liste des produits
-- `GET /api/products/:id` - Détail produit
-- `GET /api/products/category/:category` - Produits par catégorie
-- `GET /api/products/search/:query` - Recherche
-- `POST /api/products` - Créer produit (Seller)
-- `PUT /api/products/:id` - Modifier produit
-- `DELETE /api/products/:id` - Supprimer produit
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|---------|
+| GET | `/api/products` | Get all products with filters | Public |
+| GET | `/api/products/search/:query` | Search products | Public |
+| GET | `/api/products/category/:category` | Get products by category | Public |
+| GET | `/api/products/:id` | Get product by ID | Public |
+| GET | `/api/products/my-products` | Get my products | Seller/Admin |
+| POST | `/api/products` | Create new product | Seller/Admin |
+| PUT | `/api/products/:id` | Update product | Owner/Admin |
+| DELETE | `/api/products/:id` | Delete product | Owner/Admin |
 
 ### 🏪 Shops
-- `GET /api/shops` - Liste des boutiques
-- `GET /api/shops/:id` - Détail boutique
-- `GET /api/shops/featured` - Boutiques mises en avant
-- `GET /api/shops/category/:category` - Boutiques par catégorie
-- `POST /api/shops` - Créer boutique (Seller)
-- `PUT /api/shops/:id` - Modifier boutique
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|---------|
+| GET | `/api/shops` | Get all shops with filters | Public |
+| GET | `/api/shops/featured` | Get featured shops | Public |
+| GET | `/api/shops/search/:query` | Search shops | Public |
+| GET | `/api/shops/category/:category` | Get shops by category | Public |
+| GET | `/api/shops/:id` | Get shop by ID | Public |
+| GET | `/api/shops/:id/products` | Get shop products | Public |
+| GET | `/api/shops/my-shop` | Get my shop | Seller/Admin |
+| POST | `/api/shops` | Create new shop | Seller/Admin |
+| PUT | `/api/shops/:id` | Update shop | Owner/Admin |
+| PUT | `/api/shops/:id/stats` | Update shop stats | Owner/Admin |
 
-## 🏗️ Structure du projet
+### 📦 Orders
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|---------|
+| GET | `/api/orders` | Get all orders | Admin |
+| GET | `/api/orders/stats` | Get order statistics | Admin/Shop Owner |
+| GET | `/api/orders/my-orders` | Get user's orders | Private |
+| GET | `/api/orders/shop-orders` | Get shop's orders | Seller/Admin |
+| GET | `/api/orders/:id` | Get order by ID | Owner/Admin |
+| POST | `/api/orders` | Create new order | Private |
+| PUT | `/api/orders/:id/status` | Update order status | Shop Owner/Admin |
+| PUT | `/api/orders/:id/cancel` | Cancel order | Customer/Admin |
 
+### 👥 Users
+| Method | Endpoint | Description | Access |
+|--------|----------|-------------|---------|
+| GET | `/api/users` | Get all users | Admin |
+| GET | `/api/users/:id` | Get user profile | Owner/Admin |
+| GET | `/api/users/:id/stats` | Get user statistics | Owner/Admin |
+| PUT | `/api/users/:id` | Update user profile | Owner/Admin |
+| PUT | `/api/users/:id/password` | Change password | Owner |
+| PUT | `/api/users/:id/toggle-status` | Toggle user status | Admin |
+| DELETE | `/api/users/:id` | Delete user account | Owner/Admin |
+
+## 🛡️ Authentication & Authorization
+
+### JWT Token
+All protected routes require a Bearer token in the Authorization header:
 ```
-Back-end/
-├── controllers/     # Contrôleurs MVC
-│   ├── auth.js      # Authentification
-│   ├── product.js   # Produits
-│   └── shop.js      # Boutiques
-├── models/         # Modèles Mongoose
-│   ├── User.js      # Utilisateur
-│   ├── Product.js   # Produit
-│   ├── Shop.js      # Boutique
-│   └── Order.js     # Commande
-├── routes/         # Routes API
-│   ├── auth.js      # Routes auth
-│   ├── product.js   # Routes produits
-│   └── shop.js      # Routes boutiques
-├── middleware/     # Middlewares
-│   └── auth.js      # Authentification
-├── config/         # Configuration
-│   └── database.js  # Base de données
-├── app.js          # Application principale
-└── package.json    # Dépendances
+Authorization: Bearer <your_jwt_token>
 ```
 
-## 🔍 Exemples d'utilisation
+### User Roles
+- **buyer**: Can browse, search, and purchase products
+- **seller**: Can create/manage shops and products
+- **admin**: Full system access
 
-### Inscription
+## 📝 Example Usage
+
+### Register User
 ```bash
 curl -X POST http://localhost:5000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
-    "firstName": "John",
-    "lastName": "Doe",
-    "email": "john@example.com",
-    "password": "password123",
-    "role": "buyer"
+    "firstName": "أحمد",
+    "lastName": "محمد",
+    "email": "ahmed@example.com",
+    "password": "Password123",
+    "role": "buyer",
+    "phone": "+212612345678"
   }'
 ```
 
-### Connexion
+### Login
 ```bash
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "john@example.com",
-    "password": "password123"
+    "email": "ahmed@example.com",
+    "password": "Password123"
   }'
 ```
 
-### Lister les produits
+### Create Shop
 ```bash
-curl http://localhost:5000/api/products?page=1&limit=10&category=ceramics
+curl -X POST http://localhost:5000/api/shops \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "name": "محل الحرف اليدوية",
+    "description": "متخصص في المنتجات اليدوية التقليدية",
+    "categories": ["handicrafts", "textiles"]
+  }'
 ```
 
-## 🧪 Tests
-
+### Create Product
 ```bash
-# Lancer les tests (à venir)
-npm test
-
-# Tests en mode watch
-npm run test:watch
+curl -X POST http://localhost:5000/api/products \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "name": "سجادة يدوية",
+    "description": "سجادة تقليدية مصنوعة يدوياً",
+    "price": 1500,
+    "category": "textiles",
+    "stock": 5,
+    "shopId": "<shop_id>"
+  }'
 ```
 
-## 🚀 Déploiement
+### Create Order
+```bash
+curl -X POST http://localhost:5000/api/orders \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "items": [
+      {
+        "productId": "<product_id>",
+        "quantity": 2
+      }
+    ],
+    "shippingAddress": {
+      "firstName": "أحمد",
+      "lastName": "محمد",
+      "street": "شارع الحسن الثاني",
+      "city": "الرباط",
+      "postalCode": "10000",
+      "phone": "+212612345678"
+    },
+    "paymentMethod": "cash_on_delivery"
+  }'
+```
+
+## 🏗️ Project Structure
+
+```
+Back-end/
+├── controllers/          # Route controllers
+│   ├── auth.js          # Authentication logic
+│   ├── user.js          # User management
+│   ├── product.js       # Product management
+│   ├── shop.js          # Shop management
+│   └── order.js         # Order management
+├── models/              # Database models
+│   ├── User.js          # User schema
+│   ├── Product.js       # Product schema
+│   ├── Shop.js          # Shop schema
+│   └── Order.js         # Order schema
+├── routes/              # API routes
+│   ├── auth.js          # Auth routes
+│   ├── user.js          # User routes
+│   ├── product.js       # Product routes
+│   ├── shop.js          # Shop routes
+│   └── order.js         # Order routes
+├── middleware/          # Custom middleware
+│   └── auth.js          # Authentication middleware
+├── config/              # Configuration files
+│   └── database.js      # Database connection
+├── app.js               # Express app configuration
+├── server.js            # Server entry point
+├── package.json         # Dependencies
+├── .env.example         # Environment variables template
+└── README.md           # Documentation
+```
+
+## 🔧 Development
 
 ```bash
-# Build pour production
-npm run build
+# Install dependencies
+npm install
 
-# Démarrer en production
+# Start development server with auto-reload
+npm run dev
+
+# Start production server
 npm start
 ```
 
-## 📝 Scripts disponibles
+## 🎯 Features
 
-- `npm start` - Démarrer en production
-- `npm run dev` - Démarrer en développement avec nodemon
-- `npm test` - Lancer les tests
+### ✅ Implemented
+- 🔐 **Complete Authentication System** (JWT-based)
+- 👥 **User Management** (CRUD operations)
+- 🛍️ **Product Management** (with search, filters, categories)
+- 🏪 **Shop Management** (for sellers)
+- 📦 **Order Management** (full lifecycle)
+- 📊 **Statistics & Analytics**
+- 🛡️ **Role-based Access Control**
+- ✅ **Input Validation** (express-validator)
+- 🔒 **Password Hashing** (bcrypt)
+- 🌐 **CORS Configuration**
 
-## 🤝 Contribution
+### 🚀 Ready for Production
+- 📈 **Pagination & Filtering**
+- 🔍 **Advanced Search**
+- 📱 **RESTful API Design**
+- ⚡ **Performance Optimized**
+- 🛠️ **Error Handling**
+- 📝 **Comprehensive Documentation**
 
-1. Fork le projet
-2. Créer une branche feature
-3. Commit les changements
-4. Push vers la branche
-5. Ouvrir une Pull Request
+## 🌍 Supported Languages
+- Arabic (Primary)
+- French
+- English
 
-## 📄 Licence
+## 📄 License
+MIT License - see LICENSE file for details
 
-MIT License - voir le fichier LICENSE pour plus de détails.
+---
+
+## 🤝 Contributing
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+**Made with ❤️ for the Artisania Community**
