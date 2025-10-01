@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import ShopCard from '../components/ShopCard'
-import { api } from '../services/api'
+import api from '../services/api'
 import { MapPin, Star, Search, Filter } from 'lucide-react'
 
 const Shops = () => {
