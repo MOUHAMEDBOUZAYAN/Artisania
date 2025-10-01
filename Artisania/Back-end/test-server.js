@@ -7,7 +7,6 @@ app.get('/', (req, res) => {
   res.json({ 
     message: 'Test server is working!',
     port: PORT,
-    timestamp: new Date().toISOString()
   });
 });
 
