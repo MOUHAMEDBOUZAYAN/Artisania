@@ -94,14 +94,12 @@ const Header = () => {
                       >
                         Profil
                       </Link>
-                      {user?.role === 'seller' && (
-                        <Link
-                          to="/dashboard"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          Tableau de bord
-                        </Link>
-                      )}
+                      <Link
+                        to="/dashboard"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Tableau de bord
+                      </Link>
                       <button
                         onClick={handleLogout}
                         className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -178,6 +176,13 @@ const Header = () => {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Profil
+                  </Link>
+                  <Link
+                    to="/dashboard"
+                    className="block py-2 text-gray-700 hover:text-primary-500"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Tableau de bord
                   </Link>
                   <button
                     onClick={() => {

@@ -4,7 +4,8 @@ const User = require('../models/User');
 
 // Generate JWT token
 const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, {
+  const secret = process.env.JWT_SECRET || 'Mouhamed12@';
+  return jwt.sign({ userId }, secret, {
     expiresIn: process.env.JWT_EXPIRE || '7d'
   });
 };
@@ -23,7 +24,7 @@ const register = async (req, res) => {
       });
     }
 
-    const { firstName, lastName, email, password, role } = req.body;
+    const { firstName, lastName, email, password, role, phone, address } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -39,7 +40,9 @@ const register = async (req, res) => {
       lastName,
       email,
       password,
-      role: role || 'buyer'
+      role: role || 'customer',
+      phone: phone || undefined,
+      address: address || undefined
     });
 
     await user.save();

@@ -32,8 +32,31 @@ const registerValidation = [
   
   body('role')
     .optional()
-    .isIn(['buyer', 'seller', 'admin'])
-    .withMessage('Invalid role')
+    .isIn(['customer', 'seller', 'admin'])
+    .withMessage('Invalid role'),
+  
+  body('phone')
+    .optional()
+    .isMobilePhone()
+    .withMessage('Please enter a valid phone number'),
+  
+  body('address.street')
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage('Street address cannot exceed 100 characters'),
+  
+  body('address.city')
+    .optional()
+    .trim()
+    .isLength({ max: 50 })
+    .withMessage('City name cannot exceed 50 characters'),
+  
+  body('address.country')
+    .optional()
+    .trim()
+    .isLength({ max: 50 })
+    .withMessage('Country name cannot exceed 50 characters')
 ];
 
 const loginValidation = [

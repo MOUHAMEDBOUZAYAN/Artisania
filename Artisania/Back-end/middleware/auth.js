@@ -12,7 +12,8 @@ const verifyToken = async (req, res, next) => {
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production-2024';
+    const decoded = jwt.verify(token, secret);
     const user = await User.findById(decoded.userId).select('-password');
     
     if (!user || !user.isActive) {
