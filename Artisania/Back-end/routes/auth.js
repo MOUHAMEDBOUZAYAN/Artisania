@@ -5,7 +5,6 @@ const { verifyToken } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Validation rules
 const registerValidation = [
   body('firstName')
     .trim()
@@ -70,24 +69,12 @@ const loginValidation = [
     .withMessage('Password is required')
 ];
 
-// @route   POST /api/auth/register
-// @desc    Register new user
-// @access  Public
 router.post('/register', registerValidation, register);
 
-// @route   POST /api/auth/login
-// @desc    Login user
-// @access  Public
 router.post('/login', loginValidation, login);
 
-// @route   GET /api/auth/me
-// @desc    Get current user profile
-// @access  Private
 router.get('/me', verifyToken, getMe);
 
-// @route   POST /api/auth/logout
-// @desc    Logout user
-// @access  Private
 router.post('/logout', verifyToken, logout);
 
 module.exports = router;

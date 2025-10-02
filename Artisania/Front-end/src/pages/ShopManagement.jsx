@@ -98,10 +98,8 @@ const ShopManagement = () => {
 
     try {
       if (shop) {
-        // Update existing shop
         await api.put(`/shops/${shop._id}`, formData)
       } else {
-        // Create new shop
         await api.post('/shops', formData)
       }
       await fetchShop()

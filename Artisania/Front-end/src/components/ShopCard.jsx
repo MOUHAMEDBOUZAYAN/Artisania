@@ -9,7 +9,6 @@ const ShopCard = ({ shop }) => {
     e.preventDefault()
     e.stopPropagation()
     setIsLiked(!isLiked)
-    // TODO: Implement like functionality
   }
 
   const formatAddress = (address) => {

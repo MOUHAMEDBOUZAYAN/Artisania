@@ -21,7 +21,6 @@ const Products = () => {
     try {
       setLoading(true)
       const response = await api.get('/products')
-      // Handle both array and object responses
       const productsData = Array.isArray(response.data) 
         ? response.data 
         : response.data.products || []

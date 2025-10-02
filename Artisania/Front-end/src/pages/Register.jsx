@@ -51,7 +51,6 @@ const Register = () => {
     e.preventDefault()
     setLoading(true)
 
-    // Validation
     if (formData.password !== formData.confirmPassword) {
       alert('Les mots de passe ne correspondent pas')
       setLoading(false)

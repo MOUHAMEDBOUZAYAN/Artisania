@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// Verify JWT token
 const verifyToken = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
@@ -41,7 +40,6 @@ const verifyToken = async (req, res, next) => {
   }
 };
 
-// Check if user has required role
 const requireRole = (...roles) => {
   return (req, res, next) => {
     if (!req.user) {
@@ -60,7 +58,6 @@ const requireRole = (...roles) => {
   };
 };
 
-// Check if user is verified
 const requireVerified = (req, res, next) => {
   if (!req.user.isVerified) {
     return res.status(403).json({ 

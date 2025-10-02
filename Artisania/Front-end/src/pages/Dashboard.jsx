@@ -31,20 +31,13 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true)
-      // TODO: Remplacer par les vraies API calls
-      // const [statsResponse, ordersResponse] = await Promise.all([
-      //   api.get('/dashboard/stats'),
-      //   api.get('/dashboard/recent-orders')
-      // ])
+      const [statsResponse, ordersResponse] = await Promise.all([
+        api.get('/dashboard/stats'),
+        api.get('/dashboard/recent-orders')
+      ])
       
-      // Simulation de données
-      setStats({
-        totalProducts: 0,
-        totalOrders: 0,
-        totalRevenue: 0,
-        totalCustomers: 0
-      })
-      setRecentOrders([])
+      setStats(statsResponse.data)
+      setRecentOrders(ordersResponse.data)
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
     } finally {

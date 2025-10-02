@@ -3,7 +3,6 @@ import { authService } from '../services/api'
 
 const AuthContext = createContext()
 
-// Initial state
 const initialState = {
   user: null,
   token: localStorage.getItem('token'),
@@ -12,7 +11,6 @@ const initialState = {
   error: null
 }
 
-// Auth reducer
 const authReducer = (state, action) => {
   switch (action.type) {
     case 'AUTH_START':
@@ -63,11 +61,9 @@ const authReducer = (state, action) => {
   }
 }
 
-// Auth provider component
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState)
 
-  // Check if user is logged in on app start
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('token')
@@ -99,7 +95,6 @@ export const AuthProvider = ({ children }) => {
     checkAuth()
   }, [])
 
-  // Login function
   const login = async (credentials) => {
     dispatch({ type: 'AUTH_START' })
     try {
@@ -123,7 +118,6 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  // Register function
   const register = async (userData) => {
     dispatch({ type: 'AUTH_START' })
     try {
@@ -147,7 +141,6 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  // Logout function
   const logout = async () => {
     try {
       await authService.logout()
@@ -159,7 +152,6 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  // Clear error function
   const clearError = () => {
     dispatch({ type: 'CLEAR_ERROR' })
   }
@@ -179,7 +171,6 @@ export const AuthProvider = ({ children }) => {
   )
 }
 
-// Custom hook to use auth context
 export const useAuth = () => {
   const context = useContext(AuthContext)
   if (!context) {

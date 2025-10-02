@@ -2,9 +2,6 @@ const { validationResult } = require('express-validator');
 const Shop = require('../models/Shop');
 const Product = require('../models/Product');
 
-// @desc    Get all shops with filtering and pagination
-// @route   GET /api/shops
-// @access  Public
 const getShops = async (req, res) => {
   try {
     const {
@@ -18,22 +15,18 @@ const getShops = async (req, res) => {
       verified
     } = req.query;
 
-    // Build filter object
     const filter = { isActive: true };
     
     if (category) filter.categories = category;
     if (featured === 'true') filter.isFeatured = true;
     if (verified === 'true') filter.isVerified = true;
     
-    // Text search
     if (search) {
       filter.$text = { $search: search };
     }
 
-    // Pagination
     const skip = (Number(page) - 1) * Number(limit);
 
-    // Sort options
     const sort = {};
     sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
     if (search) sort.score = { $meta: 'textScore' };
@@ -64,9 +57,6 @@ const getShops = async (req, res) => {
   }
 };
 
-// @desc    Get single shop by ID
-// @route   GET /api/shops/:id
-// @access  Public
 const getShopById = async (req, res) => {
   try {
     const shop = await Shop.findById(req.params.id)
@@ -78,7 +68,6 @@ const getShopById = async (req, res) => {
       });
     }
 
-    // Get shop products
     const products = await Product.find({ 
       shopId: shop._id, 
       isActive: true 
@@ -103,9 +92,6 @@ const getShopById = async (req, res) => {
   }
 };
 
-// @desc    Get shops by category
-// @route   GET /api/shops/category/:category
-// @access  Public
 const getShopsByCategory = async (req, res) => {
   try {
     const { category } = req.params;
@@ -126,9 +112,6 @@ const getShopsByCategory = async (req, res) => {
   }
 };
 
-// @desc    Search shops
-// @route   GET /api/shops/search/:query
-// @access  Public
 const searchShops = async (req, res) => {
   try {
     const { query } = req.params;
@@ -149,9 +132,6 @@ const searchShops = async (req, res) => {
   }
 };
 
-// @desc    Get featured shops
-// @route   GET /api/shops/featured
-// @access  Public
 const getFeaturedShops = async (req, res) => {
   try {
     const { limit = 8 } = req.query;
@@ -170,12 +150,8 @@ const getFeaturedShops = async (req, res) => {
   }
 };
 
-// @desc    Create new shop
-// @route   POST /api/shops
-// @access  Private (Seller)
 const createShop = async (req, res) => {
   try {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -184,7 +160,6 @@ const createShop = async (req, res) => {
       });
     }
 
-    // Check if user already has a shop
     const existingShop = await Shop.findOne({ ownerId: req.user.id });
     if (existingShop) {
       return res.status(400).json({
@@ -223,12 +198,8 @@ const createShop = async (req, res) => {
   }
 };
 
-// @desc    Update shop
-// @route   PUT /api/shops/:id
-// @access  Private (Owner/Admin)
 const updateShop = async (req, res) => {
   try {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -282,9 +253,6 @@ const updateShop = async (req, res) => {
   }
 };
 
-// @desc    Get my shop
-// @route   GET /api/shops/my-shop
-// @access  Private (Seller)
 const getMyShop = async (req, res) => {
   try {
     const shop = await Shop.findOne({ ownerId: req.user.id })
@@ -316,15 +284,11 @@ const getMyShop = async (req, res) => {
   }
 };
 
-// @desc    Get shop products
-// @route   GET /api/shops/:id/products
-// @access  Public
 const getShopProducts = async (req, res) => {
   try {
     const { id } = req.params;
     const { page = 1, limit = 12, category, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
 
-    // Check if shop exists
     const shop = await Shop.findById(id);
     if (!shop || !shop.isActive) {
       return res.status(404).json({
@@ -332,14 +296,11 @@ const getShopProducts = async (req, res) => {
       });
     }
 
-    // Build filter
     const filter = { shopId: id, isActive: true };
     if (category) filter.category = category;
 
-    // Pagination
     const skip = (Number(page) - 1) * Number(limit);
 
-    // Sort options
     const sort = {};
     sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
@@ -379,9 +340,6 @@ const getShopProducts = async (req, res) => {
   }
 };
 
-// @desc    Update shop stats
-// @route   PUT /api/shops/:id/stats
-// @access  Private (Owner/Admin)
 const updateShopStats = async (req, res) => {
   try {
     const shop = await Shop.findById(req.params.id);

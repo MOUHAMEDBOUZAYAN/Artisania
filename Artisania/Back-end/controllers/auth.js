@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const User = require('../models/User');
 
-// Generate JWT token
 const generateToken = (userId) => {
   const secret = process.env.JWT_SECRET || 'Mouhamed12@';
   return jwt.sign({ userId }, secret, {
@@ -10,12 +9,8 @@ const generateToken = (userId) => {
   });
 };
 
-// @desc    Register new user
-// @route   POST /api/auth/register
-// @access  Public
 const register = async (req, res) => {
   try {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -26,7 +21,6 @@ const register = async (req, res) => {
 
     const { firstName, lastName, email, password, role, phone, address } = req.body;
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -34,7 +28,6 @@ const register = async (req, res) => {
       });
     }
 
-    // Create new user
     const user = new User({
       firstName,
       lastName,
@@ -47,7 +40,6 @@ const register = async (req, res) => {
 
     await user.save();
 
-    // Generate token
     const token = generateToken(user._id);
 
     res.status(201).json({
@@ -70,12 +62,8 @@ const register = async (req, res) => {
   }
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
 const login = async (req, res) => {
   try {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -86,7 +74,6 @@ const login = async (req, res) => {
 
     const { email, password } = req.body;
 
-    // Find user and include password
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
       return res.status(401).json({
@@ -94,14 +81,12 @@ const login = async (req, res) => {
       });
     }
 
-    // Check if user is active
     if (!user.isActive) {
       return res.status(401).json({
         message: 'Account is deactivated'
       });
     }
 
-    // Check password
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -109,11 +94,9 @@ const login = async (req, res) => {
       });
     }
 
-    // Update last login
     user.lastLogin = new Date();
     await user.save();
 
-    // Generate token
     const token = generateToken(user._id);
 
     res.json({
@@ -137,9 +120,6 @@ const login = async (req, res) => {
   }
 };
 
-// @desc    Get current user profile
-// @route   GET /api/auth/me
-// @access  Private
 const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -167,12 +147,8 @@ const getMe = async (req, res) => {
   }
 };
 
-// @desc    Logout user
-// @route   POST /api/auth/logout
-// @access  Private
 const logout = async (req, res) => {
   try {
-    // In a more advanced implementation, you might want to blacklist the token
     res.json({
       message: 'Logout successful'
     });

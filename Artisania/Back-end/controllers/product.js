@@ -2,9 +2,6 @@ const { validationResult } = require('express-validator');
 const Product = require('../models/Product');
 const Shop = require('../models/Shop');
 
-// @desc    Get all products with filtering and pagination
-// @route   GET /api/products
-// @access  Public
 const getProducts = async (req, res) => {
   try {
     const {
@@ -20,7 +17,6 @@ const getProducts = async (req, res) => {
       featured
     } = req.query;
 
-    // Build filter object
     const filter = { isActive: true };
     
     if (category) filter.category = category;
@@ -34,15 +30,12 @@ const getProducts = async (req, res) => {
       if (maxPrice) filter.price.$lte = Number(maxPrice);
     }
 
-    // Text search
     if (search) {
       filter.$text = { $search: search };
     }
 
-    // Pagination
     const skip = (Number(page) - 1) * Number(limit);
 
-    // Sort options
     const sort = {};
     sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
     if (search) sort.score = { $meta: 'textScore' };
@@ -74,9 +67,6 @@ const getProducts = async (req, res) => {
   }
 };
 
-// @desc    Get single product by ID
-// @route   GET /api/products/:id
-// @access  Public
 const getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id)
@@ -103,9 +93,6 @@ const getProductById = async (req, res) => {
   }
 };
 
-// @desc    Get products by category
-// @route   GET /api/products/category/:category
-// @access  Public
 const getProductsByCategory = async (req, res) => {
   try {
     const { category } = req.params;
@@ -126,9 +113,6 @@ const getProductsByCategory = async (req, res) => {
   }
 };
 
-// @desc    Search products
-// @route   GET /api/products/search/:query
-// @access  Public
 const searchProducts = async (req, res) => {
   try {
     const { query } = req.params;
@@ -149,12 +133,8 @@ const searchProducts = async (req, res) => {
   }
 };
 
-// @desc    Create new product
-// @route   POST /api/products
-// @access  Private (Seller)
 const createProduct = async (req, res) => {
   try {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -163,7 +143,6 @@ const createProduct = async (req, res) => {
       });
     }
 
-    // Check if user has a shop
     const shop = await Shop.findOne({ ownerId: req.user.id });
     if (!shop) {
       return res.status(400).json({
@@ -200,12 +179,8 @@ const createProduct = async (req, res) => {
   }
 };
 
-// @desc    Update product
-// @route   PUT /api/products/:id
-// @access  Private (Owner/Admin)
 const updateProduct = async (req, res) => {
   try {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -260,9 +235,6 @@ const updateProduct = async (req, res) => {
   }
 };
 
-// @desc    Delete product
-// @route   DELETE /api/products/:id
-// @access  Private (Owner/Admin)
 const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -306,9 +278,6 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-// @desc    Get user's products
-// @route   GET /api/products/my-products
-// @access  Private (Seller)
 const getMyProducts = async (req, res) => {
   try {
     const { page = 1, limit = 10, status = 'all' } = req.query;

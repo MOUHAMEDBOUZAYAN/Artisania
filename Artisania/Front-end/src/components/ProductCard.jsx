@@ -10,14 +10,12 @@ const ProductCard = ({ product }) => {
     e.preventDefault()
     e.stopPropagation()
     setIsInCart(!isInCart)
-    // TODO: Implement add to cart functionality
   }
 
   const handleToggleLike = (e) => {
     e.preventDefault()
     e.stopPropagation()
     setIsLiked(!isLiked)
-    // TODO: Implement like functionality
   }
 
   return (
