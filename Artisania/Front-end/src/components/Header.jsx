@@ -38,7 +38,7 @@ const Header = () => {
             <div className="relative w-full">
               <input
                 type="text"
-                placeholder="البحث عن المنتجات أو المحلات..."
+                placeholder="Rechercher des produits ou boutiques..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -58,13 +58,13 @@ const Header = () => {
               to="/products"
               className="text-gray-700 hover:text-primary-500 transition-colors"
             >
-              المنتجات
+              Produits
             </Link>
             <Link
               to="/shops"
               className="text-gray-700 hover:text-primary-500 transition-colors"
             >
-              المحلات
+              Boutiques
             </Link>
             
             {isAuthenticated ? (
@@ -92,21 +92,21 @@ const Header = () => {
                         to="/profile"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
-                        الملف الشخصي
+                        Profil
                       </Link>
                       {user?.role === 'seller' && (
                         <Link
                           to="/dashboard"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
-                          لوحة التحكم
+                          Tableau de bord
                         </Link>
                       )}
                       <button
                         onClick={handleLogout}
                         className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
-                        تسجيل الخروج
+                        Déconnexion
                       </button>
                     </div>
                   </div>
@@ -117,7 +117,7 @@ const Header = () => {
                 to="/login"
                 className="bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors"
               >
-                تسجيل الدخول
+                Connexion
               </Link>
             )}
           </nav>
@@ -138,7 +138,7 @@ const Header = () => {
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="البحث..."
+                  placeholder="Rechercher..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -153,14 +153,14 @@ const Header = () => {
                 className="block py-2 text-gray-700 hover:text-primary-500"
                 onClick={() => setIsMenuOpen(false)}
               >
-                المنتجات
+                Produits
               </Link>
               <Link
                 to="/shops"
                 className="block py-2 text-gray-700 hover:text-primary-500"
                 onClick={() => setIsMenuOpen(false)}
               >
-                المحلات
+                Boutiques
               </Link>
               
               {isAuthenticated ? (
@@ -170,14 +170,14 @@ const Header = () => {
                     className="block py-2 text-gray-700 hover:text-primary-500"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    السلة
+                    Panier
                   </Link>
                   <Link
                     to="/profile"
                     className="block py-2 text-gray-700 hover:text-primary-500"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    الملف الشخصي
+                    Profil
                   </Link>
                   <button
                     onClick={() => {
@@ -186,7 +186,7 @@ const Header = () => {
                     }}
                     className="block py-2 text-gray-700 hover:text-primary-500"
                   >
-                    تسجيل الخروج
+                    Déconnexion
                   </button>
                 </>
               ) : (
@@ -195,7 +195,7 @@ const Header = () => {
                   className="block py-2 text-gray-700 hover:text-primary-500"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  تسجيل الدخول
+                  Connexion
                 </Link>
               )}
             </div>

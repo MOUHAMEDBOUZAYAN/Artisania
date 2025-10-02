@@ -46,15 +46,15 @@ const Login = () => {
             <span className="text-white font-bold text-xl">A</span>
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            تسجيل الدخول إلى حسابك
+            Connexion à votre compte
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            أو{' '}
+            ou{' '}
             <Link
               to="/register"
               className="font-medium text-primary-600 hover:text-primary-500"
             >
-              إنشاء حساب جديد
+              Créer un nouveau compte
             </Link>
           </p>
         </div>
@@ -69,7 +69,7 @@ const Login = () => {
           <div className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                البريد الإلكتروني
+                Adresse e-mail
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -84,14 +84,14 @@ const Login = () => {
                   value={formData.email}
                   onChange={handleChange}
                   className="appearance-none relative block w-full px-3 py-3 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
-                  placeholder="أدخل بريدك الإلكتروني"
+                  placeholder="Entrez votre adresse e-mail"
                 />
               </div>
             </div>
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                كلمة المرور
+                Mot de passe
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -106,7 +106,7 @@ const Login = () => {
                   value={formData.password}
                   onChange={handleChange}
                   className="appearance-none relative block w-full px-3 py-3 pr-10 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
-                  placeholder="أدخل كلمة المرور"
+                  placeholder="Entrez votre mot de passe"
                 />
                 <button
                   type="button"
@@ -132,7 +132,7 @@ const Login = () => {
                 className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
               />
               <label htmlFor="remember-me" className="mr-2 block text-sm text-gray-900">
-                تذكرني
+                Se souvenir de moi
               </label>
             </div>
 
@@ -141,7 +141,7 @@ const Login = () => {
                 to="/forgot-password"
                 className="font-medium text-primary-600 hover:text-primary-500"
               >
-                نسيت كلمة المرور؟
+                Mot de passe oublié ?
               </Link>
             </div>
           </div>
@@ -155,19 +155,19 @@ const Login = () => {
               {loading ? (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
               ) : (
-                'تسجيل الدخول'
+                'Se connecter'
               )}
             </button>
           </div>
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              ليس لديك حساب؟{' '}
+              Vous n'avez pas de compte ?{' '}
               <Link
                 to="/register"
                 className="font-medium text-primary-600 hover:text-primary-500"
               >
-                إنشاء حساب جديد
+                Créer un nouveau compte
               </Link>
             </p>
           </div>

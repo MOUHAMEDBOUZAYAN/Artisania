@@ -21,7 +21,11 @@ const Products = () => {
     try {
       setLoading(true)
       const response = await api.get('/products')
-      setProducts(response.data)
+      // Handle both array and object responses
+      const productsData = Array.isArray(response.data) 
+        ? response.data 
+        : response.data.products || []
+      setProducts(productsData)
     } catch (err) {
       setError('Erreur lors du chargement des produits')
       console.error('Error fetching products:', err)
@@ -38,7 +42,7 @@ const Products = () => {
     }))
   }
 
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = (products || []).filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(filters.search.toLowerCase())
     const matchesCategory = !filters.category || product.category === filters.category
     const matchesMinPrice = !filters.minPrice || product.price >= parseFloat(filters.minPrice)
@@ -47,7 +51,7 @@ const Products = () => {
     return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice
   })
 
-  const categories = [...new Set(products.map(product => product.category))]
+  const categories = [...new Set((products || []).map(product => product.category))]
 
   if (loading) {
     return (

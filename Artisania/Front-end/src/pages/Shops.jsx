@@ -24,7 +24,11 @@ const Shops = () => {
     try {
       setLoading(true)
       const response = await api.get('/shops')
-      setShops(response.data)
+      // Handle both array and object responses
+      const shopsData = Array.isArray(response.data) 
+        ? response.data 
+        : response.data.shops || []
+      setShops(shopsData)
     } catch (err) {
       setError('Erreur lors du chargement des boutiques')
       console.error('Error fetching shops:', err)
@@ -41,7 +45,7 @@ const Shops = () => {
     }))
   }
 
-  const filteredShops = shops.filter(shop => {
+  const filteredShops = (shops || []).filter(shop => {
     const matchesSearch = shop.name.toLowerCase().includes(filters.search.toLowerCase()) ||
                          shop.description.toLowerCase().includes(filters.search.toLowerCase())
     const matchesCity = !filters.city || shop.address?.city === filters.city
@@ -51,8 +55,8 @@ const Shops = () => {
     return matchesSearch && matchesCity && matchesCategory && matchesRating
   })
 
-  const cities = [...new Set(shops.map(shop => shop.address?.city).filter(Boolean))]
-  const categories = [...new Set(shops.flatMap(shop => shop.categories || []))]
+  const cities = [...new Set((shops || []).map(shop => shop.address?.city).filter(Boolean))]
+  const categories = [...new Set((shops || []).flatMap(shop => shop.categories || []))]
 
   if (loading) {
     return (

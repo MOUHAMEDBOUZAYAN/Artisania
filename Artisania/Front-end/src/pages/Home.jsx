@@ -42,23 +42,23 @@ const Home = () => {
       <section className="bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-2xl p-8 md:p-12">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            مرحباً بك في Artisania
+            Bienvenue sur Artisania
           </h1>
           <p className="text-xl md:text-2xl mb-8 opacity-90">
-            منصة ربط الحرفيين مع العملاء للوصول إلى المنتجات اليدوية الأصيلة
+            Plateforme de connexion entre artisans et clients pour accéder aux produits artisanaux authentiques
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/products"
               className="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
             >
-              استكشف المنتجات
+              Explorer les produits
             </Link>
             <Link
               to="/shops"
               className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-primary-600 transition-colors"
             >
-              تصفح المحلات
+              Parcourir les boutiques
             </Link>
           </div>
         </div>
@@ -67,12 +67,12 @@ const Home = () => {
       {/* Featured Shops */}
       <section>
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-800">المحلات المميزة</h2>
+          <h2 className="text-3xl font-bold text-gray-800">Boutiques en vedette</h2>
           <Link
             to="/shops"
             className="text-primary-500 hover:text-primary-600 font-semibold"
           >
-            عرض الكل
+            Voir tout
           </Link>
         </div>
         
@@ -116,7 +116,7 @@ const Home = () => {
                       <h3 className="font-semibold text-lg">{shop.name}</h3>
                       <div className="flex items-center text-gray-500 text-sm">
                         <MapPin className="w-4 h-4 mr-1" />
-                        {shop.address?.city || 'المدينة'}
+                        {shop.address?.city || 'Ville'}
                       </div>
                     </div>
                   </div>
@@ -131,7 +131,7 @@ const Home = () => {
                       </span>
                     </div>
                     <span className="text-sm text-gray-500">
-                      {shop.stats?.totalProducts || 0} منتج
+                      {shop.stats?.totalProducts || 0} produit{shop.stats?.totalProducts !== 1 ? 's' : ''}
                     </span>
                   </div>
                 </div>
@@ -141,7 +141,7 @@ const Home = () => {
         ) : (
           <div className="text-center py-12">
             <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">لا توجد محلات مميزة حالياً</p>
+            <p className="text-gray-500">Aucune boutique en vedette pour le moment</p>
           </div>
         )}
       </section>
@@ -149,12 +149,12 @@ const Home = () => {
       {/* Featured Products */}
       <section>
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-800">المنتجات المميزة</h2>
+          <h2 className="text-3xl font-bold text-gray-800">Produits en vedette</h2>
           <Link
             to="/products"
             className="text-primary-500 hover:text-primary-600 font-semibold"
           >
-            عرض الكل
+            Voir tout
           </Link>
         </div>
         
@@ -188,7 +188,7 @@ const Home = () => {
                   </p>
                   <div className="flex items-center justify-between">
                     <span className="text-primary-600 font-bold text-lg">
-                      {product.price} د.م
+                      {product.price} MAD
                     </span>
                     <div className="flex items-center">
                       <Star className="w-4 h-4 text-yellow-400 fill-current" />
@@ -204,7 +204,7 @@ const Home = () => {
         ) : (
           <div className="text-center py-12">
             <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">لا توجد منتجات مميزة حالياً</p>
+            <p className="text-gray-500">Aucun produit en vedette pour le moment</p>
           </div>
         )}
       </section>
@@ -212,16 +212,16 @@ const Home = () => {
       {/* Call to Action */}
       <section className="bg-gray-100 rounded-2xl p-8 md:p-12 text-center">
         <h2 className="text-3xl font-bold text-gray-800 mb-4">
-          هل أنت حرفي؟
+          Êtes-vous artisan ?
         </h2>
         <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-          انضم إلى منصة Artisania وشارك منتجاتك اليدوية مع العملاء في جميع أنحاء المغرب
+          Rejoignez la plateforme Artisania et partagez vos produits artisanaux avec les clients dans tout le Maroc
         </p>
         <Link
           to="/register"
           className="bg-primary-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-600 transition-colors inline-block"
         >
-          ابدأ الآن
+          Commencer maintenant
         </Link>
       </section>
     </div>
