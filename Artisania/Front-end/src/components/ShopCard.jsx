@@ -4,6 +4,10 @@ import { MapPin, Star, Heart, Phone, Clock, ShoppingBag } from 'lucide-react'
 
 const ShopCard = ({ shop }) => {
   const [isLiked, setIsLiked] = useState(false)
+  
+  console.log('🛍️ ShopCard received shop:', shop)
+  console.log('🖼️ Shop banner:', shop.banner)
+  console.log('🏷️ Shop logo:', shop.logo)
 
   const handleToggleLike = (e) => {
     e.preventDefault()
@@ -31,9 +35,14 @@ const ShopCard = ({ shop }) => {
       <div className="aspect-video bg-gray-100 relative overflow-hidden">
         {shop.banner ? (
           <img
-            src={shop.banner.url}
+            src={shop.banner}
             alt={shop.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              console.error('❌ Error loading banner image:', shop.banner)
+              e.target.style.display = 'none'
+            }}
+            onLoad={() => console.log('✅ Banner image loaded:', shop.banner)}
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
@@ -69,9 +78,14 @@ const ShopCard = ({ shop }) => {
           <div className="flex-shrink-0">
             {shop.logo ? (
               <img
-                src={shop.logo.url}
+                src={shop.logo}
                 alt={shop.name}
                 className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
+                onError={(e) => {
+                  console.error('❌ Error loading logo image:', shop.logo)
+                  e.target.style.display = 'none'
+                }}
+                onLoad={() => console.log('✅ Logo image loaded:', shop.logo)}
               />
             ) : (
               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">

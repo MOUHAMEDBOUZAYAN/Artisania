@@ -9,6 +9,6 @@ RUN npm ci --only=production
 
 COPY . .
 
-EXPOSE 5000
+EXPOSE 5001
 
-CMD ["npm", "start"]
+CMD ["nodemon", "server.js"]

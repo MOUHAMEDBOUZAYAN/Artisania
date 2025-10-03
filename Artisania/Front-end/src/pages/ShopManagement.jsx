@@ -14,6 +14,7 @@ import {
   X
 } from 'lucide-react'
 import api from '../services/api'
+import ImageUpload from '../components/ImageUpload'
 
 const ShopManagement = () => {
   console.log('🔄 ShopManagement component rendering...')
@@ -29,6 +30,8 @@ const ShopManagement = () => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
+    logo: '',
+    banner: '',
     address: {
       street: '',
       city: '',
@@ -58,6 +61,8 @@ const ShopManagement = () => {
         setFormData({
           name: response.data.shop.name || '',
           description: response.data.shop.description || '',
+          logo: response.data.shop.logo || '',
+          banner: response.data.shop.banner || '',
           address: response.data.shop.address || { street: '', city: '', country: 'Morocco', postalCode: '' },
           phone: response.data.shop.contact?.phone || '',
           email: response.data.shop.contact?.email || '',
@@ -325,6 +330,28 @@ const ShopManagement = () => {
                   rows={4}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Décrivez votre boutique et vos produits..."
+                />
+              </div>
+            </div>
+
+            {/* Images */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Images</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <ImageUpload
+                  label="Logo de la boutique"
+                  aspectRatio="logo"
+                  existingImage={formData.logo}
+                  onImageUploaded={(url) => setFormData(prev => ({ ...prev, logo: url }))}
+                  maxSize={2}
+                />
+                
+                <ImageUpload
+                  label="Bannière de la boutique"
+                  aspectRatio="banner"
+                  existingImage={formData.banner}
+                  onImageUploaded={(url) => setFormData(prev => ({ ...prev, banner: url }))}
+                  maxSize={5}
                 />
               </div>
             </div>

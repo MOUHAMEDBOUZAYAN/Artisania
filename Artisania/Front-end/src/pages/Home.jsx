@@ -3,6 +3,8 @@ import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { shopService, productService } from '../services/api'
 import { Star, MapPin, ShoppingBag } from 'lucide-react'
+import ShopCard from '../components/ShopCard'
+import ProductCard from '../components/ProductCard'
 
 const Home = () => {
   const { user, isAuthenticated } = useAuth()
@@ -16,12 +18,18 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const [shopsResponse, productsResponse] = await Promise.all([
-          shopService.getFeaturedShops(),
-          productService.getProducts({ limit: 8, featured: true })
+          shopService.getShops({ limit: 8 }), // عرض جميع المتاجر النشطة
+          productService.getProducts({ limit: 8 }) // عرض جميع المنتجات النشطة
         ])
+        
+        console.log('🏠 Home - Shops response:', shopsResponse.data)
+        console.log('🏠 Home - Products response:', productsResponse.data)
         
         setFeaturedShops(shopsResponse.data.shops || [])
         setFeaturedProducts(productsResponse.data.products || [])
+        
+        console.log('🏠 Home - Featured shops:', shopsResponse.data.shops || [])
+        console.log('🏠 Home - Featured products:', productsResponse.data.products || [])
       } catch (error) {
         console.error('Error fetching data:', error)
       } finally {
@@ -83,63 +91,7 @@ const Home = () => {
         {featuredShops.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredShops.map((shop) => (
-              <Link
-                key={shop._id}
-                to={`/shops/${shop._id}`}
-                className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden"
-              >
-                <div className="aspect-video bg-gray-200 relative">
-                  {shop.banner ? (
-                    <img
-                      src={shop.banner.url}
-                      alt={shop.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
-                      <ShoppingBag className="w-12 h-12 text-primary-500" />
-                    </div>
-                  )}
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center mb-3">
-                    {shop.logo ? (
-                      <img
-                        src={shop.logo.url}
-                        alt={shop.name}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-                        <span className="text-primary-600 font-bold">
-                          {shop.name.charAt(0)}
-                        </span>
-                      </div>
-                    )}
-                    <div className="mr-3">
-                      <h3 className="font-semibold text-lg">{shop.name}</h3>
-                      <div className="flex items-center text-gray-500 text-sm">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        {shop.address?.city || 'Ville'}
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 text-sm line-clamp-2">
-                    {shop.description}
-                  </p>
-                  <div className="flex items-center justify-between mt-4">
-                    <div className="flex items-center">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span className="text-sm text-gray-600 mr-1">
-                        {shop.rating?.average || 0}
-                      </span>
-                    </div>
-                    <span className="text-sm text-gray-500">
-                      {shop.stats?.totalProducts || 0} produit{shop.stats?.totalProducts !== 1 ? 's' : ''}
-                    </span>
-                  </div>
-                </div>
-              </Link>
+              <ShopCard key={shop._id} shop={shop} />
             ))}
           </div>
         ) : (
@@ -165,44 +117,7 @@ const Home = () => {
         {featuredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts.map((product) => (
-              <Link
-                key={product._id}
-                to={`/products/${product._id}`}
-                className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden"
-              >
-                <div className="aspect-square bg-gray-200 relative">
-                  {product.images && product.images.length > 0 ? (
-                    <img
-                      src={product.images[0].url}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                      <ShoppingBag className="w-12 h-12 text-gray-400" />
-                    </div>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-lg mb-2 line-clamp-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                    {product.description}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-primary-600 font-bold text-lg">
-                      {product.price} MAD
-                    </span>
-                    <div className="flex items-center">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span className="text-sm text-gray-600 mr-1">
-                        {product.averageRating || 0}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </Link>
+              <ProductCard key={product._id} product={product} />
             ))}
           </div>
         ) : (

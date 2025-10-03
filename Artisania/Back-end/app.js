@@ -1,3 +1,5 @@
+require('dotenv').config({ path: './.env' });
+
 const express = require('express');
 const cors = require('cors');
 
@@ -20,6 +22,7 @@ const productRoutes = require('./routes/product');
 const shopRoutes = require('./routes/shop');
 const orderRoutes = require('./routes/order');
 const userRoutes = require('./routes/user');
+const uploadRoutes = require('./routes/upload');
 
 app.get('/', (req, res) => {
   res.json({ 
@@ -31,7 +34,8 @@ app.get('/', (req, res) => {
       products: '/api/products',
       shops: '/api/shops',
       orders: '/api/orders',
-      users: '/api/users'
+      users: '/api/users',
+      upload: '/api/upload'
     }
   });
 });
@@ -50,6 +54,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/shops', shopRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/upload', uploadRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

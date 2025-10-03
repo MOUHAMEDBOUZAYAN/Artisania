@@ -5,6 +5,11 @@ import { Heart, ShoppingCart, Star, Eye } from 'lucide-react'
 const ProductCard = ({ product }) => {
   const [isLiked, setIsLiked] = useState(false)
   const [isInCart, setIsInCart] = useState(false)
+  
+  console.log('📦 ProductCard received product:', product)
+  console.log('🖼️ Product images:', product.images)
+  console.log('🔍 First image:', product.images?.[0])
+  console.log('🔍 First image URL:', product.images?.[0]?.url)
 
   const handleAddToCart = (e) => {
     e.preventDefault()
@@ -27,9 +32,14 @@ const ProductCard = ({ product }) => {
       <div className="aspect-square bg-gray-100 relative overflow-hidden">
         {product.images && product.images.length > 0 ? (
           <img
-            src={product.images[0].url}
+            src={product.images[0].url || product.images[0]}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              console.error('❌ Error loading product image:', product.images[0])
+              e.target.style.display = 'none'
+            }}
+            onLoad={() => console.log('✅ Product image loaded:', product.images[0])}
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">

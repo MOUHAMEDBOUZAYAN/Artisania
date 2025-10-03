@@ -14,6 +14,7 @@ import {
   X
 } from 'lucide-react'
 import api from '../services/api'
+import ImageUpload from '../components/ImageUpload'
 
 const ProductManagement = () => {
   const { user, isAuthenticated, loading: authLoading } = useAuth()
@@ -303,6 +304,53 @@ const ProductManagement = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="0"
                 />
+              </div>
+            </div>
+
+            {/* Images */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Images du produit
+              </label>
+              <div className="space-y-4">
+                {formData.images.map((image, index) => (
+                  <div key={index} className="flex items-center gap-4">
+                    <ImageUpload
+                      label={`Image ${index + 1}`}
+                      aspectRatio="square"
+                      existingImage={image.url}
+                      onImageUploaded={(url) => {
+                        const newImages = [...formData.images]
+                        newImages[index] = { ...image, url }
+                        setFormData(prev => ({ ...prev, images: newImages }))
+                      }}
+                      maxSize={5}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newImages = formData.images.filter((_, i) => i !== index)
+                        setFormData(prev => ({ ...prev, images: newImages }))
+                      }}
+                      className="text-red-500 hover:text-red-700 p-2"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData(prev => ({
+                      ...prev,
+                      images: [...prev.images, { url: '', alt: '' }]
+                    }))
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 border border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400"
+                >
+                  <Plus className="w-4 h-4" />
+                  Ajouter une image
+                </button>
               </div>
             </div>
 
