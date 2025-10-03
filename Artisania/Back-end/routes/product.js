@@ -39,7 +39,7 @@ const productValidation = [
   body('category')
     .isIn([
       'ceramics', 'textiles', 'jewelry', 'painting', 'woodwork',
-      'metalwork', 'glasswork', 'leatherwork', 'pottery', 'sculpture', 'other'
+      'metalwork', 'glasswork', 'leatherwork', 'pottery', 'sculpture', 'food', 'other'
     ])
     .withMessage('Invalid product category'),
   

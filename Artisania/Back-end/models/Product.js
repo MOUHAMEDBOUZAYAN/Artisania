@@ -31,6 +31,7 @@ const productSchema = new mongoose.Schema({
       'leatherwork',   // جلد
       'pottery',       // فخار
       'sculpture',     // نحت
+      'food',          // طعام
       'other'          // أخرى
     ]
   },

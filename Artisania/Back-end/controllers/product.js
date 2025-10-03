@@ -135,8 +135,12 @@ const searchProducts = async (req, res) => {
 
 const createProduct = async (req, res) => {
   try {
+    console.log('📦 createProduct called with data:', req.body);
+    console.log('👤 User:', req.user.email, 'Role:', req.user.role);
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ Validation errors:', errors.array());
       return res.status(400).json({
         message: 'Validation failed',
         errors: errors.array()

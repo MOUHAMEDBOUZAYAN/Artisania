@@ -10,7 +10,8 @@ import {
   Filter,
   Package,
   Star,
-  DollarSign
+  DollarSign,
+  X
 } from 'lucide-react'
 import api from '../services/api'
 
@@ -22,7 +23,32 @@ const ProductManagement = () => {
   const [filterCategory, setFilterCategory] = useState('')
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState(null)
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    price: '',
+    category: '',
+    stock: '',
+    images: []
+  })
 
+  const fetchProducts = async () => {
+    try {
+      setLoading(true)
+      const response = await api.get('/products/my-products')
+      setProducts(response.data.products || [])
+    } catch (error) {
+      console.error('Error fetching products:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchProducts()
+  }, [])
+
+  // جميع الـ conditional returns بعد الـ hooks
   if (authLoading) {
     return (
       <div className="flex justify-center items-center min-h-64">
@@ -46,30 +72,6 @@ const ProductManagement = () => {
       </div>
     )
   }
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    category: '',
-    stock: '',
-    images: []
-  })
-
-  useEffect(() => {
-    fetchProducts()
-  }, [])
-
-  const fetchProducts = async () => {
-    try {
-      setLoading(true)
-      const response = await api.get('/products/my-products')
-      setProducts(response.data.products || [])
-    } catch (error) {
-      console.error('Error fetching products:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -82,10 +84,19 @@ const ProductManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
+      // تحويل البيانات قبل الإرسال
+      const productData = {
+        ...formData,
+        price: parseFloat(formData.price) || 0,
+        stock: parseInt(formData.stock) || 0
+      }
+      
+      console.log('📦 Sending product data:', productData)
+      
       if (editingProduct) {
-        await api.put(`/products/${editingProduct._id}`, formData)
+        await api.put(`/products/${editingProduct._id}`, productData)
       } else {
-        await api.post('/products', formData)
+        await api.post('/products', productData)
       }
       await fetchProducts()
       setShowAddForm(false)
@@ -238,15 +249,27 @@ const ProductManagement = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Catégorie *
                 </label>
-                <input
-                  type="text"
+                <select
                   name="category"
                   value={formData.category}
                   onChange={handleInputChange}
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Ex: Bijoux, Poterie, Textile"
-                />
+                >
+                  <option value="">Sélectionner une catégorie</option>
+                  <option value="ceramics">Céramique</option>
+                  <option value="textiles">Textile</option>
+                  <option value="jewelry">Bijoux</option>
+                  <option value="painting">Peinture</option>
+                  <option value="woodwork">Menuiserie</option>
+                  <option value="metalwork">Métallurgie</option>
+                  <option value="glasswork">Verre</option>
+                  <option value="leatherwork">Cuir</option>
+                  <option value="pottery">Poterie</option>
+                  <option value="sculpture">Sculpture</option>
+                  <option value="food">Nourriture</option>
+                  <option value="other">Autre</option>
+                </select>
               </div>
 
               <div>
