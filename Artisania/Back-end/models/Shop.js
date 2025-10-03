@@ -29,8 +29,16 @@ const shopSchema = new mongoose.Schema({
   contact: {
     email: {
       type: String,
-      required: [true, 'Contact email is required'],
-      match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
+      required: false, // جعل الحقل اختيارياً
+      validate: {
+        validator: function(v) {
+          // إذا كان فارغاً أو undefined، فهو صحيح
+          if (!v || v === '') return true;
+          // إذا كان له قيمة، يجب أن يكون بريد إلكتروني صحيح
+          return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v);
+        },
+        message: 'Please enter a valid email'
+      }
     },
     phone: {
       type: String,

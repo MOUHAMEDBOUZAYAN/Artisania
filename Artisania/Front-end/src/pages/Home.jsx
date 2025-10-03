@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { shopService, productService } from '../services/api'
 import { Star, MapPin, ShoppingBag } from 'lucide-react'
 
 const Home = () => {
+  const { user, isAuthenticated } = useAuth()
   const [featuredShops, setFeaturedShops] = useState([])
   const [featuredProducts, setFeaturedProducts] = useState([])
   const [loading, setLoading] = useState(true)
+
+  // السماح للبائعين بالوصول للصفحة الرئيسية أيضاً
 
   useEffect(() => {
     const fetchData = async () => {

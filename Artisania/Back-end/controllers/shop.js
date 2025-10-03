@@ -152,8 +152,12 @@ const getFeaturedShops = async (req, res) => {
 
 const createShop = async (req, res) => {
   try {
+    console.log('🏪 createShop called with data:', req.body);
+    console.log('👤 User:', req.user.email, 'Role:', req.user.role);
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ Validation errors:', errors.array());
       return res.status(400).json({
         message: 'Validation failed',
         errors: errors.array()
@@ -174,13 +178,31 @@ const createShop = async (req, res) => {
       });
     }
 
+    // تحويل البيانات لتتناسب مع نموذج Shop
+    const { name, description, address, phone, email, workingHours, categories } = req.body;
+    
     const shopData = {
-      ...req.body,
+      name,
+      description,
+      contact: {
+        phone,
+        email: email || ''
+      },
+      address: {
+        street: address.street,
+        city: address.city,
+        country: address.country || 'Morocco',
+        postalCode: address.postalCode || '00000' // إضافة postalCode افتراضي
+      },
+      workingHours: workingHours || { open: '09:00', close: '18:00' },
+      categories: categories || [],
       ownerId: req.user.id
     };
 
+    console.log('💾 Creating shop with data:', shopData);
     const shop = new Shop(shopData);
     await shop.save();
+    console.log('✅ Shop created successfully:', shop._id);
 
     // Populate the created shop
     const populatedShop = await Shop.findById(shop._id)
@@ -255,10 +277,14 @@ const updateShop = async (req, res) => {
 
 const getMyShop = async (req, res) => {
   try {
+    console.log('🔍 getMyShop called for user:', req.user.id);
     const shop = await Shop.findOne({ ownerId: req.user.id })
       .populate('ownerId', 'firstName lastName avatar email');
 
+    console.log('🏪 Shop found:', !!shop);
+    
     if (!shop) {
+      console.log('❌ No shop found for user:', req.user.id);
       return res.status(404).json({
         message: 'You don\'t have a shop yet'
       });

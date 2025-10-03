@@ -9,6 +9,8 @@ import Shops from './pages/Shops'
 import Dashboard from './pages/Dashboard'
 import ShopManagement from './pages/ShopManagement'
 import ProductManagement from './pages/ProductManagement'
+import ShopDetail from './pages/ShopDetail'
+import Cart from './components/Cart'
 import './App.css'
 
 function App() {
@@ -24,9 +26,11 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/products" element={<Products />} />
               <Route path="/shops" element={<Shops />} />
+              <Route path="/shops/:id" element={<ShopDetail />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/dashboard/shop" element={<ShopManagement />} />
               <Route path="/dashboard/products" element={<ProductManagement />} />
+              <Route path="/cart" element={<Cart />} />
             </Routes>
           </main>
         </div>

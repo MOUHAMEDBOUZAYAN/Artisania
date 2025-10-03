@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
@@ -11,8 +11,22 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   
-  const { login, error, clearError } = useAuth()
+  const { login, error, clearError, user, isAuthenticated } = useAuth()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    console.log('Login useEffect: isAuthenticated =', isAuthenticated, 'user =', user)
+    if (isAuthenticated && user) {
+      console.log('Login useEffect: User role =', user.role)
+      if (user.role === 'seller') {
+        console.log('Login useEffect: Redirecting seller to dashboard')
+        navigate('/dashboard', { replace: true })
+      } else {
+        console.log('Login useEffect: Redirecting customer to home')
+        navigate('/', { replace: true })
+      }
+    }
+  }, [isAuthenticated, user, navigate])
 
   const handleChange = (e) => {
     setFormData({
@@ -22,17 +36,31 @@ const Login = () => {
     if (error) clearError()
   }
 
+
   const handleSubmit = async (e) => {
     e.preventDefault()
+    console.log('Login page: Form submitted with data:', formData)
     setLoading(true)
 
     try {
+      console.log('Login page: Calling login function...')
       const result = await login(formData)
+      console.log('Login page: Login result:', result)
       if (result.success) {
-        navigate('/')
+        console.log('Login page: Login successful, redirecting...')
+        // Utiliser les données retournées directement
+        const userData = result.user || JSON.parse(localStorage.getItem('user') || '{}')
+        console.log('Login page: Redirecting user with role:', userData.role)
+        if (userData.role === 'seller') {
+          navigate('/dashboard', { replace: true })
+        } else {
+          navigate('/', { replace: true })
+        }
+      } else {
+        console.log('Login page: Login failed:', result.error)
       }
     } catch (error) {
-      console.error('Login error:', error)
+      console.error('Login page: Login error:', error)
     } finally {
       setLoading(false)
     }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { 
   Plus, 
   Edit, 
@@ -14,12 +15,37 @@ import {
 import api from '../services/api'
 
 const ProductManagement = () => {
+  const { user, isAuthenticated, loading: authLoading } = useAuth()
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterCategory, setFilterCategory] = useState('')
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState(null)
+
+  if (authLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (user?.role !== 'seller') {
+    return (
+      <div className="max-w-7xl mx-auto text-center py-12">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Accès refusé</h1>
+        <p className="text-gray-600 mb-6">Vous devez être un vendeur pour accéder à cette page.</p>
+        <Link to="/" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+          Retour à l'accueil
+        </Link>
+      </div>
+    )
+  }
   const [formData, setFormData] = useState({
     name: '',
     description: '',

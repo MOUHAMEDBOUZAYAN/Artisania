@@ -55,6 +55,12 @@ const Header = () => {
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link
+              to="/"
+              className="text-gray-700 hover:text-primary-500 transition-colors"
+            >
+              Accueil
+            </Link>
+            <Link
               to="/products"
               className="text-gray-700 hover:text-primary-500 transition-colors"
             >
@@ -146,6 +152,13 @@ const Header = () => {
             </form>
             
             <div className="space-y-2">
+              <Link
+                to="/"
+                className="block py-2 text-gray-700 hover:text-primary-500"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Accueil
+              </Link>
               <Link
                 to="/products"
                 className="block py-2 text-gray-700 hover:text-primary-500"

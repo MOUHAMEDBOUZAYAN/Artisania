@@ -64,8 +64,11 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
+    console.log('Login attempt:', { email: req.body.email, timestamp: new Date() });
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors.array());
       return res.status(400).json({
         message: 'Validation failed',
         errors: errors.array()
@@ -73,31 +76,43 @@ const login = async (req, res) => {
     }
 
     const { email, password } = req.body;
+    console.log('Looking for user with email:', email);
 
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
+      console.log('User not found for email:', email);
       return res.status(401).json({
         message: 'Invalid email or password'
       });
     }
 
+    console.log('User found:', { id: user._id, email: user.email, isActive: user.isActive });
+
     if (!user.isActive) {
+      console.log('User account is deactivated');
       return res.status(401).json({
         message: 'Account is deactivated'
       });
     }
 
+    console.log('Comparing password...');
     const isPasswordValid = await user.comparePassword(password);
+    console.log('Password valid:', isPasswordValid);
+    
     if (!isPasswordValid) {
+      console.log('Invalid password for user:', email);
       return res.status(401).json({
         message: 'Invalid email or password'
       });
     }
 
+    console.log('Password is valid, updating last login...');
     user.lastLogin = new Date();
     await user.save();
 
+    console.log('Generating token...');
     const token = generateToken(user._id);
+    console.log('Token generated successfully');
 
     res.json({
       message: 'Login successful',
@@ -160,9 +175,72 @@ const logout = async (req, res) => {
   }
 };
 
+const getDashboardStats = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    const Product = require('../models/Product');
+    const Order = require('../models/Order');
+    const Shop = require('../models/Shop');
+    
+    const [totalProducts, totalOrders, shop] = await Promise.all([
+      Product.countDocuments({ ownerId: userId, isActive: true }),
+      Order.countDocuments({ 'items.shopId': { $exists: true } }),
+      Shop.findOne({ ownerId: userId })
+    ]);
+    
+    const totalRevenue = 0;
+    const totalCustomers = 0;
+    
+    res.json({
+      totalProducts,
+      totalOrders,
+      totalRevenue,
+      totalCustomers
+    });
+  } catch (error) {
+    console.error('Dashboard stats error:', error);
+    res.status(500).json({
+      message: 'Server error while fetching dashboard stats'
+    });
+  }
+};
+
+const getRecentOrders = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    const Order = require('../models/Order');
+    
+    const recentOrders = await Order.find({ 'items.shopId': { $exists: true } })
+      .populate('customerId', 'firstName lastName')
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select('orderNumber total status createdAt customerId');
+    
+    const formattedOrders = recentOrders.map(order => ({
+      _id: order._id,
+      orderNumber: order.orderNumber,
+      total: order.total,
+      status: order.status,
+      customerName: order.customerId ? `${order.customerId.firstName} ${order.customerId.lastName}` : 'Client inconnu',
+      createdAt: order.createdAt
+    }));
+    
+    res.json(formattedOrders);
+  } catch (error) {
+    console.error('Recent orders error:', error);
+    res.status(500).json({
+      message: 'Server error while fetching recent orders'
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
   getMe,
-  logout
+  logout,
+  getDashboardStats,
+  getRecentOrders
 };

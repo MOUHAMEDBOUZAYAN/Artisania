@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { Link, Navigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { 
   Plus, 
   Edit, 
@@ -15,17 +16,24 @@ import {
 import api from '../services/api'
 
 const ShopManagement = () => {
+  console.log('🔄 ShopManagement component rendering...')
+  
+  const { user, isAuthenticated, loading: authLoading } = useAuth()
+  console.log('🔐 Auth state:', { user: user?.email, isAuthenticated, authLoading })
+  
   const [shop, setShop] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
+  const hasFetched = useRef(false)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     address: {
       street: '',
       city: '',
-      country: 'Morocco'
+      country: 'Morocco',
+      postalCode: ''
     },
     phone: '',
     email: '',
@@ -36,31 +44,90 @@ const ShopManagement = () => {
     categories: []
   })
 
-  useEffect(() => {
-    fetchShop()
-  }, [])
-
-  const fetchShop = async () => {
+  const fetchShop = useCallback(async () => {
+    console.log('🔍 fetchShop function called')
     try {
+      console.log('📡 Making API call to /shops/my-shop')
       setLoading(true)
       const response = await api.get('/shops/my-shop')
-      if (response.data) {
-        setShop(response.data)
+      console.log('📡 API response received:', response.data)
+      
+      if (response.data && response.data.shop) {
+        console.log('✅ Shop found, setting up edit mode')
+        setShop(response.data.shop)
         setFormData({
-          name: response.data.name || '',
-          description: response.data.description || '',
-          address: response.data.address || { street: '', city: '', country: 'Morocco' },
-          phone: response.data.phone || '',
-          email: response.data.email || '',
-          workingHours: response.data.workingHours || { open: '09:00', close: '18:00' },
-          categories: response.data.categories || []
+          name: response.data.shop.name || '',
+          description: response.data.shop.description || '',
+          address: response.data.shop.address || { street: '', city: '', country: 'Morocco', postalCode: '' },
+          phone: response.data.shop.contact?.phone || '',
+          email: response.data.shop.contact?.email || '',
+          workingHours: response.data.shop.workingHours || { open: '09:00', close: '18:00' },
+          categories: response.data.shop.categories || []
         })
+        setIsEditing(true)
+      } else {
+        console.log('❌ No shop data in response')
+        setIsEditing(false)
       }
     } catch (error) {
-      console.error('Error fetching shop:', error)
+      console.error('❌ Error fetching shop:', error)
+      console.error('❌ Error details:', {
+        status: error.response?.status,
+        message: error.message,
+        data: error.response?.data
+      })
+      if (error.response?.status === 404) {
+        console.log('ℹ️ No shop found (404), showing create form')
+        setIsEditing(false)
+      } else {
+        console.log('❌ Unexpected error, showing create form as fallback')
+        setIsEditing(false)
+      }
     } finally {
+      console.log('🏁 fetchShop completed, setting loading to false')
       setLoading(false)
     }
+  }, [])
+
+  useEffect(() => {
+    console.log('🔄 useEffect called, hasFetched:', hasFetched.current)
+    if (!hasFetched.current) {
+      hasFetched.current = true
+      console.log('🚀 Calling fetchShop for the first time')
+      fetchShop()
+    } else {
+      console.log('⏭️ fetchShop already called, skipping')
+    }
+  }, []) // إزالة fetchShop من dependencies لتجنب التكرار
+
+  console.log('✅ User authenticated as seller, proceeding with component')
+
+  // جميع الـ conditional returns بعد الـ hooks
+  if (authLoading) {
+    console.log('⏳ Auth loading, showing spinner')
+    return (
+      <div className="flex justify-center items-center min-h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    console.log('❌ Not authenticated, redirecting to login')
+    return <Navigate to="/login" replace />
+  }
+
+  if (user?.role !== 'seller') {
+    console.log('❌ User is not a seller, showing access denied')
+    return (
+      <div className="max-w-7xl mx-auto text-center py-12">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Accès refusé</h1>
+        <p className="text-gray-600 mb-6">Vous devez être un vendeur pour accéder à cette page.</p>
+        <Link to="/" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+          Retour à l'accueil
+        </Link>
+      </div>
+    )
   }
 
   const handleInputChange = (e) => {
@@ -94,30 +161,48 @@ const ShopManagement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    console.log('💾 Form submitted, saving shop...')
+    console.log('📝 Form data:', formData)
+    console.log('🏪 Shop exists:', !!shop)
+    
     setSaving(true)
 
     try {
       if (shop) {
+        console.log('🔄 Updating existing shop...')
         await api.put(`/shops/${shop._id}`, formData)
+        console.log('✅ Shop updated successfully')
       } else {
+        console.log('🆕 Creating new shop...')
         await api.post('/shops', formData)
+        console.log('✅ Shop created successfully')
       }
+      console.log('🔄 Refreshing shop data...')
       await fetchShop()
       setIsEditing(false)
     } catch (error) {
-      console.error('Error saving shop:', error)
+      console.error('❌ Error saving shop:', error)
+      console.error('❌ Error details:', {
+        status: error.response?.status,
+        message: error.message,
+        data: error.response?.data
+      })
     } finally {
+      console.log('🏁 Save operation completed')
       setSaving(false)
     }
   }
 
   if (loading) {
+    console.log('⏳ Loading state, showing spinner')
     return (
       <div className="flex justify-center items-center min-h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     )
   }
+
+  console.log('🎨 Rendering main component, isEditing:', isEditing, 'shop:', !!shop)
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -273,6 +358,20 @@ const ShopManagement = () => {
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Ville"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Code postal
+                  </label>
+                  <input
+                    type="text"
+                    name="address.postalCode"
+                    value={formData.address.postalCode}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Code postal"
                   />
                 </div>
                 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import api from '../services/api'
 import { 
   Plus, 
   Store, 
@@ -14,7 +15,7 @@ import {
 } from 'lucide-react'
 
 const Dashboard = () => {
-  const { user } = useAuth()
+  const { user, isAuthenticated, loading: authLoading } = useAuth()
   const [stats, setStats] = useState({
     totalProducts: 0,
     totalOrders: 0,
@@ -25,24 +26,74 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchDashboardData()
-  }, [])
+    if (isAuthenticated && user?.role === 'seller') {
+      fetchDashboardData()
+    }
+  }, [isAuthenticated, user])
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true)
+      const token = localStorage.getItem('token')
+      console.log('Dashboard: Token from localStorage:', token)
+      console.log('Dashboard: User from localStorage:', localStorage.getItem('user'))
+      
       const [statsResponse, ordersResponse] = await Promise.all([
-        api.get('/dashboard/stats'),
-        api.get('/dashboard/recent-orders')
+        api.get('/auth/dashboard/stats'),
+        api.get('/auth/dashboard/recent-orders')
       ])
       
-      setStats(statsResponse.data)
-      setRecentOrders(ordersResponse.data)
+      console.log('Dashboard: Stats response:', statsResponse.data)
+      console.log('Dashboard: Orders response:', ordersResponse.data)
+      
+      // التحقق من صحة البيانات قبل تعيينها
+      const statsData = statsResponse.data || {}
+      const ordersData = ordersResponse.data || []
+      
+      console.log('🔍 Processing stats data:', statsData)
+      console.log('🔍 Processing orders data:', ordersData)
+      
+      const processedStats = {
+        totalProducts: Number(statsData.totalProducts) || 0,
+        totalOrders: Number(statsData.totalOrders) || 0,
+        totalRevenue: Number(statsData.totalRevenue) || 0,
+        totalCustomers: Number(statsData.totalCustomers) || 0
+      }
+      
+      console.log('✅ Processed stats:', processedStats)
+      
+      setStats(processedStats)
+      setRecentOrders(Array.isArray(ordersData) ? ordersData : [])
     } catch (error) {
-      console.error('Error fetching dashboard data:', error)
+      console.error('Dashboard: Error fetching dashboard data:', error)
+      console.error('Dashboard: Error response:', error.response?.data)
     } finally {
       setLoading(false)
     }
+  }
+
+  if (authLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (user?.role !== 'seller') {
+    return (
+      <div className="max-w-7xl mx-auto text-center py-12">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Accès refusé</h1>
+        <p className="text-gray-600 mb-6">Vous devez être un vendeur pour accéder à cette page.</p>
+        <Link to="/" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+          Retour à l'accueil
+        </Link>
+      </div>
+    )
   }
 
   if (loading) {

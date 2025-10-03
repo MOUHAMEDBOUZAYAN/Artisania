@@ -1,6 +1,6 @@
 const express = require('express');
 const { body } = require('express-validator');
-const { register, login, getMe, logout } = require('../controllers/auth');
+const { register, login, getMe, logout, getDashboardStats, getRecentOrders } = require('../controllers/auth');
 const { verifyToken } = require('../middleware/auth');
 
 const router = express.Router();
@@ -76,5 +76,9 @@ router.post('/login', loginValidation, login);
 router.get('/me', verifyToken, getMe);
 
 router.post('/logout', verifyToken, logout);
+
+router.get('/dashboard/stats', verifyToken, getDashboardStats);
+
+router.get('/dashboard/recent-orders', verifyToken, getRecentOrders);
 
 module.exports = router;

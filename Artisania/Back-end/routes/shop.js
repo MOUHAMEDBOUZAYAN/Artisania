@@ -32,21 +32,23 @@ const shopValidation = [
     .isLength({ max: 1000 })
     .withMessage('Description cannot exceed 1000 characters'),
   
-  body('contact.email')
-    .isEmail()
-    .withMessage('Please enter a valid contact email')
-    .normalizeEmail(),
+  body('email')
+    .optional()
+    .custom((value) => {
+      if (value && value !== '' && value !== '@') {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+          throw new Error('Please enter a valid email');
+        }
+      }
+      return true;
+    }),
   
-  body('contact.phone')
+  body('phone')
     .notEmpty()
-    .withMessage('Contact phone is required')
+    .withMessage('Phone is required')
     .matches(/^[0-9+\-\s()]+$/)
     .withMessage('Please enter a valid phone number'),
-  
-  body('contact.website')
-    .optional()
-    .isURL()
-    .withMessage('Please enter a valid website URL'),
   
   body('address.street')
     .notEmpty()
@@ -56,14 +58,9 @@ const shopValidation = [
     .notEmpty()
     .withMessage('City is required'),
   
-  body('address.postalCode')
-    .notEmpty()
-    .withMessage('Postal code is required'),
-  
   body('address.country')
-    .optional()
-    .isLength({ min: 2, max: 50 })
-    .withMessage('Country must be between 2 and 50 characters'),
+    .notEmpty()
+    .withMessage('Country is required'),
   
   body('categories')
     .optional()
