@@ -9,12 +9,12 @@ services:
     depends_on:
       - backend
     environment:
-      - REACT_APP_API_URL=http://localhost:5000
+      - REACT_APP_API_URL=http://localhost:5001
 
   backend:
     build: ./Back-end
     ports:
-      - "5000:5000"
+      - "5001:5001"
     environment:
       - NODE_ENV=production
       - MONGODB_URI=mongodb://mongo:27017/artisania

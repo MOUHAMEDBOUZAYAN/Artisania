@@ -4,12 +4,10 @@ const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
 
-// Set Cloudinary credentials directly (temporary fix)
 process.env.CLOUDINARY_CLOUD_NAME = 'dkbltpmer';
 process.env.CLOUDINARY_API_KEY = '687977978336645';
 process.env.CLOUDINARY_API_SECRET = '_pmTWBzPetcy4YCXo1nAwFJ3g3s';
 
-// Configure Cloudinary
 console.log('🔧 Cloudinary config:', {
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY ? '***' + process.env.CLOUDINARY_API_KEY.slice(-4) : 'undefined',
@@ -22,12 +20,10 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Test Cloudinary connection
 cloudinary.api.ping()
   .then(result => console.log('✅ Cloudinary connected successfully:', result))
   .catch(error => console.error('❌ Cloudinary connection failed:', error));
 
-// Configure storage for shop images
 const shopStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -39,7 +35,6 @@ const shopStorage = new CloudinaryStorage({
   }
 });
 
-// Configure storage for product images
 const productStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -51,7 +46,6 @@ const productStorage = new CloudinaryStorage({
   }
 });
 
-// Configure storage for shop logos
 const logoStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -63,7 +57,6 @@ const logoStorage = new CloudinaryStorage({
   }
 });
 
-// Configure storage for shop banners
 const bannerStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -75,7 +68,6 @@ const bannerStorage = new CloudinaryStorage({
   }
 });
 
-// Multer uploaders
 const uploadShopImages = multer({ storage: shopStorage });
 const uploadProductImages = multer({ storage: productStorage });
 const uploadLogo = multer({ storage: logoStorage });

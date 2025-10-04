@@ -284,11 +284,13 @@ const deleteProduct = async (req, res) => {
 
 const getMyProducts = async (req, res) => {
   try {
-    const { page = 1, limit = 10, status = 'all' } = req.query;
+    const { page = 1, limit = 10, status = 'active' } = req.query;
 
     const filter = { ownerId: req.user.id };
-    if (status !== 'all') {
-      filter.isActive = status === 'active';
+    if (status === 'active') {
+      filter.isActive = true;
+    } else if (status === 'inactive') {
+      filter.isActive = false;
     }
 
     const skip = (Number(page) - 1) * Number(limit);

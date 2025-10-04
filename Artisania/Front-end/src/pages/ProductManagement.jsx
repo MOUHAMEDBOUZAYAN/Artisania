@@ -15,6 +15,8 @@ import {
 } from 'lucide-react'
 import api from '../services/api'
 import ImageUpload from '../components/ImageUpload'
+import DeleteConfirmation from '../components/DeleteConfirmation'
+import { validateProductForm } from '../utils/validation'
 
 const ProductManagement = () => {
   const { user, isAuthenticated, loading: authLoading } = useAuth()
@@ -24,6 +26,10 @@ const ProductManagement = () => {
   const [filterCategory, setFilterCategory] = useState('')
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [productToDelete, setProductToDelete] = useState(null)
+  const [deleting, setDeleting] = useState(false)
+  const [formErrors, setFormErrors] = useState({})
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -33,15 +39,18 @@ const ProductManagement = () => {
     images: []
   })
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (showLoader = true) => {
     try {
-      setLoading(true)
+      if (showLoader) setLoading(true)
+      console.log('🔄 Fetching products...')
       const response = await api.get('/products/my-products')
+      console.log('📦 Products response:', response.data)
       setProducts(response.data.products || [])
+      console.log('✅ Products updated:', response.data.products?.length || 0, 'products')
     } catch (error) {
-      console.error('Error fetching products:', error)
+      console.error('❌ Error fetching products:', error)
     } finally {
-      setLoading(false)
+      if (showLoader) setLoading(false)
     }
   }
 
@@ -80,10 +89,28 @@ const ProductManagement = () => {
       ...prev,
       [name]: value
     }))
+    
+    // Clear error when user starts typing
+    if (formErrors[name]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }))
+    }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    
+    // Validate form data
+    const validation = validateProductForm(formData)
+    if (!validation.isValid) {
+      setFormErrors(validation.errors)
+      return
+    }
+    
+    setFormErrors({})
+    
     try {
       // تحويل البيانات قبل الإرسال
       const productData = {
@@ -112,18 +139,54 @@ const ProductManagement = () => {
       })
     } catch (error) {
       console.error('Error saving product:', error)
+      if (error.response?.data?.errors) {
+        const backendErrors = {}
+        error.response.data.errors.forEach(err => {
+          backendErrors[err.path] = err.msg
+        })
+        setFormErrors(backendErrors)
+      }
     }
   }
 
-  const handleDelete = async (productId) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
-      try {
-        await api.delete(`/products/${productId}`)
-        await fetchProducts()
-      } catch (error) {
-        console.error('Error deleting product:', error)
-      }
+  const handleDeleteClick = (product) => {
+    setProductToDelete(product)
+    setShowDeleteConfirm(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!productToDelete) return
+    
+    try {
+      setDeleting(true)
+      console.log('🗑️ Deleting product:', productToDelete._id)
+      
+      // Mise à jour immédiate de l'état local
+      setProducts(prevProducts => 
+        prevProducts.filter(product => product._id !== productToDelete._id)
+      )
+      
+      await api.delete(`/products/${productToDelete._id}`)
+      console.log('✅ Product deleted successfully')
+      
+      // Recharger les produits pour s'assurer de la synchronisation
+      await fetchProducts(false)
+      
+      setShowDeleteConfirm(false)
+      setProductToDelete(null)
+    } catch (error) {
+      console.error('❌ Error deleting product:', error)
+      // En cas d'erreur, recharger les produits pour restaurer l'état
+      await fetchProducts(false)
+      alert('Erreur lors de la suppression du produit')
+    } finally {
+      setDeleting(false)
     }
+  }
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirm(false)
+    setProductToDelete(null)
   }
 
   const handleEdit = (product) => {
@@ -241,9 +304,16 @@ const ProductManagement = () => {
                   value={formData.name}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                    formErrors.name 
+                      ? 'border-red-300 focus:ring-red-500' 
+                      : 'border-gray-300 focus:ring-blue-500'
+                  }`}
                   placeholder="Nom du produit"
                 />
+                {formErrors.name && (
+                  <p className="mt-1 text-sm text-red-600">{formErrors.name}</p>
+                )}
               </div>
 
               <div>
@@ -364,9 +434,16 @@ const ProductManagement = () => {
                 onChange={handleInputChange}
                 required
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                  formErrors.description 
+                    ? 'border-red-300 focus:ring-red-500' 
+                    : 'border-gray-300 focus:ring-blue-500'
+                }`}
                 placeholder="Décrivez votre produit en détail..."
               />
+              {formErrors.description && (
+                <p className="mt-1 text-sm text-red-600">{formErrors.description}</p>
+              )}
             </div>
 
             <div className="flex items-center justify-end gap-4">
@@ -418,9 +495,14 @@ const ProductManagement = () => {
                   <div className="aspect-square bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
                     {product.images && product.images.length > 0 ? (
                       <img
-                        src={product.images[0].url}
+                        src={product.images[0].url || product.images[0]}
                         alt={product.name}
-                        className="w-full h-full object-cover rounded-lg"
+                        className="w-full h-full object-contain rounded-lg"
+                        onError={(e) => {
+                          console.error('❌ Error loading product image in management:', product.images[0])
+                          e.target.style.display = 'none'
+                        }}
+                        onLoad={() => console.log('✅ Product image loaded in management:', product.images[0])}
                       />
                     ) : (
                       <Package className="w-12 h-12 text-gray-400" />
@@ -456,7 +538,7 @@ const ProductManagement = () => {
                         Modifier
                       </button>
                       <button
-                        onClick={() => handleDelete(product._id)}
+                        onClick={() => handleDeleteClick(product)}
                         className="flex items-center gap-1 px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -470,6 +552,16 @@ const ProductManagement = () => {
           )}
         </div>
       </div>
+
+      <DeleteConfirmation
+        isOpen={showDeleteConfirm}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Supprimer le produit"
+        message="Êtes-vous sûr de vouloir supprimer ce produit ?"
+        itemName={productToDelete?.name}
+        isLoading={deleting}
+      />
     </div>
   )
 }

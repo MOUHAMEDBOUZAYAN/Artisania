@@ -33,8 +33,8 @@ const productValidation = [
   body('price')
     .isNumeric()
     .withMessage('Price must be a number')
-    .isFloat({ min: 0 })
-    .withMessage('Price cannot be negative'),
+    .isFloat({ min: 0.01, max: 999999.99 })
+    .withMessage('Price must be between 0.01 and 999999.99'),
   
   body('category')
     .isIn([
@@ -45,8 +45,8 @@ const productValidation = [
   
   body('stock')
     .optional()
-    .isInt({ min: 0 })
-    .withMessage('Stock must be a non-negative integer'),
+    .isInt({ min: 0, max: 999999 })
+    .withMessage('Stock must be between 0 and 999999'),
   
   body('images')
     .optional()
