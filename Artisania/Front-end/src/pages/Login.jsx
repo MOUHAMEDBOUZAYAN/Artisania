@@ -10,6 +10,7 @@ const Login = () => {
   })
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [validationErrors, setValidationErrors] = useState({})
   
   const { login, error, clearError, user, isAuthenticated } = useAuth()
   const navigate = useNavigate()
@@ -34,11 +35,45 @@ const Login = () => {
       [e.target.name]: e.target.value
     })
     if (error) clearError()
+    
+    // Clear validation error for this field when user starts typing
+    if (validationErrors[e.target.name]) {
+      setValidationErrors(prev => ({
+        ...prev,
+        [e.target.name]: ''
+      }))
+    }
+  }
+
+  const validateForm = () => {
+    const errors = {}
+    
+    if (!formData.email.trim()) {
+      errors.email = 'Veuillez saisir votre adresse e-mail'
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = 'Veuillez saisir une adresse e-mail valide'
+    }
+    
+    if (!formData.password) {
+      errors.password = 'Veuillez saisir votre mot de passe'
+    }
+    
+    return errors
   }
 
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    
+    // Validate form before submission
+    const errors = validateForm()
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors)
+      return
+    }
+    
+    // Clear any previous validation errors
+    setValidationErrors({})
     console.log('Login page: Form submitted with data:', formData)
     setLoading(true)
 
@@ -94,6 +129,17 @@ const Login = () => {
             </div>
           )}
 
+          {Object.keys(validationErrors).length > 0 && (
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+              <p className="font-medium">Veuillez remplir tous les champs obligatoires :</p>
+              <ul className="mt-2 list-disc list-inside">
+                {Object.values(validationErrors).map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -108,13 +154,17 @@ const Login = () => {
                   name="email"
                   type="email"
                   autoComplete="email"
-                  required
                   value={formData.email}
                   onChange={handleChange}
-                  className="appearance-none relative block w-full px-3 py-3 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+                  className={`appearance-none relative block w-full px-3 py-3 pr-10 border placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm ${
+                    validationErrors.email ? 'border-red-300' : 'border-gray-300'
+                  }`}
                   placeholder="Entrez votre adresse e-mail"
                 />
               </div>
+              {validationErrors.email && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.email}</p>
+              )}
             </div>
 
             <div>
@@ -130,10 +180,11 @@ const Login = () => {
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
-                  required
                   value={formData.password}
                   onChange={handleChange}
-                  className="appearance-none relative block w-full px-3 py-3 pr-10 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+                  className={`appearance-none relative block w-full px-3 py-3 pr-10 pl-10 border placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm ${
+                    validationErrors.password ? 'border-red-300' : 'border-gray-300'
+                  }`}
                   placeholder="Entrez votre mot de passe"
                 />
                 <button
@@ -148,6 +199,9 @@ const Login = () => {
                   )}
                 </button>
               </div>
+              {validationErrors.password && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.password}</p>
+              )}
             </div>
           </div>
 
