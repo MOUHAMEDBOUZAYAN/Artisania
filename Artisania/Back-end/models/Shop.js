@@ -112,18 +112,6 @@ const shopSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  rating: {
-    average: {
-      type: Number,
-      default: 0,
-      min: 0,
-      max: 5
-    },
-    totalReviews: {
-      type: Number,
-      default: 0
-    }
-  },
   stats: {
     totalProducts: {
       type: Number,
@@ -204,7 +192,7 @@ shopSchema.statics.getFeaturedShops = function(limit = 10) {
   })
   .populate('ownerId', 'firstName lastName avatar')
   .limit(limit)
-  .sort({ 'rating.average': -1, createdAt: -1 });
+  .sort({ createdAt: -1 });
 };
 
 // Static method to get shops by category
@@ -216,7 +204,7 @@ shopSchema.statics.getByCategory = function(category, limit = 10) {
   })
   .populate('ownerId', 'firstName lastName avatar')
   .limit(limit)
-  .sort({ 'rating.average': -1 });
+  .sort({ createdAt: -1 });
 };
 
 // Static method to search shops

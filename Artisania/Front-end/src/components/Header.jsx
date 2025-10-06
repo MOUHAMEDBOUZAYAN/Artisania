@@ -1,24 +1,16 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Search, ShoppingCart, User, Menu, X } from 'lucide-react'
+import { ShoppingCart, User, Menu, X } from 'lucide-react'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
   const { user, isAuthenticated, logout } = useAuth()
   const navigate = useNavigate()
 
   const handleLogout = async () => {
     await logout()
     navigate('/')
-  }
-
-  const handleSearch = (e) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`)
-    }
   }
 
   return (
@@ -33,24 +25,6 @@ const Header = () => {
             <span className="text-xl font-bold text-gray-800">Artisania</span>
           </Link>
 
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-lg mx-8">
-            <div className="relative w-full">
-              <input
-                type="text"
-                placeholder="Rechercher des produits ou boutiques..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
-              <button
-                type="submit"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-primary-500"
-              >
-                <Search className="w-5 h-5" />
-              </button>
-            </div>
-          </form>
 
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center space-x-8">
@@ -140,19 +114,6 @@ const Header = () => {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200">
-            <form onSubmit={handleSearch} className="mb-4">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Rechercher..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-                <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
-              </div>
-            </form>
-            
             <div className="space-y-2">
               <Link
                 to="/"

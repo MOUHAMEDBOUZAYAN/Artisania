@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Eye, EyeOff, Mail, Lock, User, Phone, MapPin } from 'lucide-react'
 
@@ -25,6 +25,7 @@ const Register = () => {
   
   const { register, error, clearError } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -111,7 +112,9 @@ const Register = () => {
     try {
       const result = await register(formData)
       if (result.success) {
-        navigate('/')
+        // Récupérer la page d'origine depuis l'état de navigation
+        const from = location.state?.from?.pathname || '/'
+        navigate(from, { replace: true })
       }
     } catch (error) {
       console.error('Registration error:', error)

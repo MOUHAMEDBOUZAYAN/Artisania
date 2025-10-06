@@ -92,16 +92,6 @@ const productSchema = new mongoose.Schema({
     default: false
   },
   tags: [String],
-  averageRating: {
-    type: Number,
-    default: 0,
-    min: 0,
-    max: 5
-  },
-  totalReviews: {
-    type: Number,
-    default: 0
-  },
   totalSales: {
     type: Number,
     default: 0

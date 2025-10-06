@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Heart, ShoppingCart, Star, Eye } from 'lucide-react'
+import { Heart, ShoppingCart, Eye } from 'lucide-react'
 
 const ProductCard = ({ product }) => {
   const [isLiked, setIsLiked] = useState(false)
@@ -110,24 +110,6 @@ const ProductCard = ({ product }) => {
           {product.description}
         </p>
 
-        {/* Rating */}
-        <div className="flex items-center gap-1 mb-3">
-          <div className="flex items-center">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`w-4 h-4 ${
-                  i < (product.averageRating || 0)
-                    ? 'text-yellow-400 fill-current'
-                    : 'text-gray-300'
-                }`}
-              />
-            ))}
-          </div>
-          <span className="text-sm text-gray-500">
-            ({product.reviewCount || 0})
-          </span>
-        </div>
 
         {/* Price and Actions */}
         <div className="flex items-center justify-between">
