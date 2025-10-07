@@ -514,7 +514,7 @@ const ProductManagement = () => {
                     <p className="text-sm text-gray-600 line-clamp-2">{product.description}</p>
                     
                     <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-blue-600">{product.price} MAD</span>
+                      <span className="text-lg font-bold text-blue-600">{product.price} DH</span>
                       <span className="text-sm text-gray-500">Stock: {product.stock}</span>
                     </div>
                     

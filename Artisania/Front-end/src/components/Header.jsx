@@ -4,16 +4,24 @@ import { useAuth } from '../context/AuthContext'
 import { ShoppingCart, User, Menu, X } from 'lucide-react'
 
 const Header = () => {
+  console.log('🎯 Header component rendering')
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { user, isAuthenticated, logout } = useAuth()
-  const navigate = useNavigate()
+  
+  try {
+    const { user, isAuthenticated, logout } = useAuth()
+    console.log('🎯 Header useAuth result:', { 
+      user: user?.email, 
+      isAuthenticated,
+      role: user?.role 
+    })
+    const navigate = useNavigate()
 
-  const handleLogout = async () => {
-    await logout()
-    navigate('/')
-  }
+    const handleLogout = async () => {
+      await logout()
+      navigate('/')
+    }
 
-  return (
+    return (
     <header className="bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
@@ -186,7 +194,27 @@ const Header = () => {
         )}
       </div>
     </header>
-  )
+    )
+  } catch (error) {
+    console.error('❌ Header component error:', error)
+    return (
+      <header className="bg-white shadow-md sticky top-0 z-50">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">!</span>
+              </div>
+              <span className="text-xl font-bold text-gray-800">Artisania</span>
+            </div>
+            <div className="text-red-500 text-sm">
+              Erreur de connexion
+            </div>
+          </div>
+        </div>
+      </header>
+    )
+  }
 }
 
 export default Header

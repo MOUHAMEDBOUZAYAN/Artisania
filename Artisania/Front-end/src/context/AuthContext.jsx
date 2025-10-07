@@ -1,7 +1,7 @@
 import { createContext, useContext, useReducer, useEffect } from 'react'
 import { authService } from '../services/api'
 
-const AuthContext = createContext()
+const AuthContext = createContext(undefined)
 
 const initialState = {
   user: null,
@@ -62,7 +62,13 @@ const authReducer = (state, action) => {
 }
 
 export const AuthProvider = ({ children }) => {
+  console.log('🔐 AuthProvider rendering')
   const [state, dispatch] = useReducer(authReducer, initialState)
+  console.log('🔐 AuthProvider state:', { 
+    user: state.user?.email, 
+    isAuthenticated: state.isAuthenticated,
+    loading: state.loading 
+  })
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -189,6 +195,12 @@ export const AuthProvider = ({ children }) => {
     clearError
   }
 
+  console.log('🔐 AuthProvider providing value:', { 
+    user: value.user?.email, 
+    isAuthenticated: value.isAuthenticated,
+    loading: value.loading 
+  })
+
   return (
     <AuthContext.Provider value={value}>
       {children}
@@ -197,10 +209,19 @@ export const AuthProvider = ({ children }) => {
 }
 
 export const useAuth = () => {
+  console.log('🔐 useAuth called')
   const context = useContext(AuthContext)
+  console.log('🔐 Context value:', context)
+  
   if (!context) {
+    console.error('❌ useAuth called outside AuthProvider!')
     throw new Error('useAuth must be used within an AuthProvider')
   }
+  
+  console.log('✅ useAuth returning context:', { 
+    user: context.user?.email, 
+    isAuthenticated: context.isAuthenticated 
+  })
   return context
 }
 

@@ -276,4 +276,4 @@ MIT License - see LICENSE file for details
 
 ---
 
-**Made with ❤️ for the Artisania Community**
+**Made with ❤️ for Mouhamed Bouzayan**

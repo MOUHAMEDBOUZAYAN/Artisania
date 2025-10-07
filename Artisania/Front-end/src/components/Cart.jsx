@@ -116,7 +116,7 @@ const Cart = () => {
                         <h3 className="font-medium text-gray-900">{item.name}</h3>
                         <p className="text-sm text-gray-600">{item.shopName}</p>
                         <p className="text-lg font-semibold text-blue-600">
-                          {item.price.toFixed(2)} MAD
+                          {item.price.toFixed(2)} DH
                         </p>
                       </div>
                       <div className="flex items-center space-x-2">

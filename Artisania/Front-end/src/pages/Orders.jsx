@@ -232,7 +232,7 @@ const Orders = () => {
                             {item.productName} x {item.quantity}
                           </span>
                           <span className="font-medium text-gray-900">
-                            {item.price * item.quantity} MAD
+                            {item.price * item.quantity} DH
                           </span>
                         </div>
                       ))}

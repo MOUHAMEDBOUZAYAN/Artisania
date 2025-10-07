@@ -59,10 +59,29 @@ export const shopService = {
   getFeaturedShops: () => api.get('/shops/featured'),
   searchShops: (query) => api.get(`/shops/search/${query}`),
   getShopsByCategory: (category) => api.get(`/shops/category/${category}`),
-  createShop: (shopData) => api.post('/shops', shopData),
+  createShop: (shopData) => {
+    console.log('📡 API: Creating shop with data:', shopData)
+    return api.post('/shops', shopData)
+  },
   updateShop: (id, shopData) => api.put(`/shops/${id}`, shopData),
   getMyShop: () => api.get('/shops/my-shop'),
-  getShopProducts: (id) => api.get(`/shops/${id}/products`)
+  getShopProducts: (id) => api.get(`/shops/${id}/products`),
+  // طريقة محسنة للتحقق من وجود المتجر
+  checkMyShop: async () => {
+    try {
+      console.log('📡 API: Making GET request to /shops/my-shop')
+      const response = await api.get('/shops/my-shop')
+      console.log('✅ API: Shop found:', response.data)
+      return { exists: true, data: response.data }
+    } catch (error) {
+      if (error.response?.status === 404) {
+        console.log('ℹ️ API: Shop not found (404)')
+        return { exists: false, data: null }
+      }
+      console.log('❌ API: Error checking shop:', error)
+      throw error
+    }
+  }
 }
 
 export const orderService = {

@@ -179,7 +179,7 @@ const createShop = async (req, res) => {
     }
 
     // تحويل البيانات لتتناسب مع نموذج Shop
-    const { name, description, address, phone, email, workingHours, categories } = req.body;
+    const { name, description, address, phone, email, categories, isOpen } = req.body;
     
     const shopData = {
       name,
@@ -194,9 +194,9 @@ const createShop = async (req, res) => {
         country: address.country || 'Morocco',
         postalCode: address.postalCode || '00000' // إضافة postalCode افتراضي
       },
-      workingHours: workingHours || { open: '09:00', close: '18:00' },
       categories: categories || [],
-      ownerId: req.user.id
+      ownerId: req.user.id,
+      isOpen: isOpen !== undefined ? isOpen : true
     };
 
     console.log('💾 Creating shop with data:', shopData);
@@ -222,15 +222,22 @@ const createShop = async (req, res) => {
 
 const updateShop = async (req, res) => {
   try {
+    console.log('🔄 updateShop called with ID:', req.params.id)
+    console.log('📝 Request body:', JSON.stringify(req.body, null, 2))
+    console.log('👤 User:', req.user?.email, 'Role:', req.user?.role)
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ Validation errors:', errors.array())
       return res.status(400).json({
         message: 'Validation failed',
         errors: errors.array()
       });
     }
 
+    console.log('🔍 Finding shop with ID:', req.params.id)
     const shop = await Shop.findById(req.params.id);
+    console.log('🏪 Shop found:', shop ? 'Yes' : 'No')
 
     if (!shop) {
       return res.status(404).json({
@@ -246,13 +253,38 @@ const updateShop = async (req, res) => {
     }
 
     // Update shop
+    console.log('🔄 Updating shop fields...')
     Object.keys(req.body).forEach(key => {
       if (req.body[key] !== undefined) {
-        shop[key] = req.body[key];
+        console.log(`📝 Updating field: ${key} = ${JSON.stringify(req.body[key])}`)
+        if (key === 'address') {
+          // Handle nested address object - preserve existing coordinates
+          const newAddress = { ...req.body[key] };
+          
+          // Only preserve coordinates if they exist and new ones aren't provided
+          if (shop.address && shop.address.coordinates && !newAddress.coordinates) {
+            newAddress.coordinates = shop.address.coordinates;
+          }
+          
+          shop.address = { 
+            ...shop.address, 
+            ...newAddress
+          };
+          console.log('🏠 Updated address:', shop.address)
+        } else if (key === 'contact') {
+          // Handle nested contact object
+          shop.contact = { ...shop.contact, ...req.body[key] };
+          console.log('📞 Updated contact:', shop.contact)
+        } else {
+          shop[key] = req.body[key];
+          console.log(`✅ Updated ${key}:`, shop[key])
+        }
       }
     });
 
+    console.log('💾 Saving shop to database...')
     await shop.save();
+    console.log('✅ Shop saved successfully')
 
     // Populate the updated shop
     const updatedShop = await Shop.findById(shop._id)
@@ -263,14 +295,20 @@ const updateShop = async (req, res) => {
       shop: updatedShop
     });
   } catch (error) {
-    console.error('Update shop error:', error);
+    console.error('❌ Update shop error:', error);
+    console.error('❌ Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     if (error.name === 'CastError') {
       return res.status(404).json({
         message: 'Shop not found'
       });
     }
     res.status(500).json({
-      message: 'Server error while updating shop'
+      message: 'Server error while updating shop',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
     });
   }
 };

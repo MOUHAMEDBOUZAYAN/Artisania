@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
 
@@ -14,24 +14,20 @@ const Login = () => {
   
   const { login, error, clearError, user, isAuthenticated } = useAuth()
   const navigate = useNavigate()
-  const location = useLocation()
 
   useEffect(() => {
     console.log('Login useEffect: isAuthenticated =', isAuthenticated, 'user =', user)
     if (isAuthenticated && user) {
       console.log('Login useEffect: User role =', user.role)
-      // Récupérer la page d'origine depuis l'état de navigation
-      const from = location.state?.from?.pathname || '/'
-      
-      if (user.role === 'seller' || user.role === 'admin') {
-        console.log('Login useEffect: Redirecting seller/admin to dashboard')
+      if (user.role === 'seller') {
+        console.log('Login useEffect: Redirecting seller to dashboard')
         navigate('/dashboard', { replace: true })
       } else {
-        console.log('Login useEffect: Redirecting customer to original page or home')
-        navigate(from, { replace: true })
+        console.log('Login useEffect: Redirecting customer to home')
+        navigate('/', { replace: true })
       }
     }
-  }, [isAuthenticated, user, navigate, location])
+  }, [isAuthenticated, user, navigate])
 
   const handleChange = (e) => {
     setFormData({
@@ -90,14 +86,10 @@ const Login = () => {
         // Utiliser les données retournées directement
         const userData = result.user || JSON.parse(localStorage.getItem('user') || '{}')
         console.log('Login page: Redirecting user with role:', userData.role)
-        
-        // Récupérer la page d'origine depuis l'état de navigation
-        const from = location.state?.from?.pathname || '/'
-        
-        if (userData.role === 'seller' || userData.role === 'admin') {
+        if (userData.role === 'seller') {
           navigate('/dashboard', { replace: true })
         } else {
-          navigate(from, { replace: true })
+          navigate('/', { replace: true })
         }
       } else {
         console.log('Login page: Login failed:', result.error)

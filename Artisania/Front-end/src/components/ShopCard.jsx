@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { MapPin, Heart, Phone, Clock, ShoppingBag } from 'lucide-react'
+import { MapPin, Heart, Phone, ShoppingBag } from 'lucide-react'
 
 const ShopCard = ({ shop }) => {
   const [isLiked, setIsLiked] = useState(false)
@@ -21,10 +21,6 @@ const ShopCard = ({ shop }) => {
     return parts.join(', ')
   }
 
-  const formatWorkingHours = (hours) => {
-    if (!hours || !hours.open || !hours.close) return 'Horaires non disponibles'
-    return `${hours.open} - ${hours.close}`
-  }
 
   return (
     <Link
@@ -61,11 +57,11 @@ const ShopCard = ({ shop }) => {
         {/* Status Badge */}
         <div className="absolute top-3 left-3">
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-            shop.isOpen 
+            (shop.isOpen !== undefined ? shop.isOpen : shop.isActive)
               ? 'bg-green-500 text-white' 
               : 'bg-red-500 text-white'
           }`}>
-            {shop.isOpen ? 'Ouvert' : 'Fermé'}
+            {(shop.isOpen !== undefined ? shop.isOpen : shop.isActive) ? 'Ouvert' : 'Fermé'}
           </span>
         </div>
       </div>
@@ -116,13 +112,6 @@ const ShopCard = ({ shop }) => {
           </p>
         </div>
 
-        {/* Working Hours */}
-        <div className="flex items-start gap-2 mb-4">
-          <Clock className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-          <p className="text-sm text-gray-600">
-            {formatWorkingHours(shop.workingHours)}
-          </p>
-        </div>
 
         {/* Stats */}
         <div className="flex items-center justify-between pt-4 border-t border-gray-100">

@@ -69,8 +69,14 @@ const shopSchema = new mongoose.Schema({
       default: 'Morocco'
     },
     coordinates: {
-      latitude: Number,
-      longitude: Number
+      latitude: {
+        type: Number,
+        default: null
+      },
+      longitude: {
+        type: Number,
+        default: null
+      }
     }
   },
   socialMedia: {
@@ -101,6 +107,10 @@ const shopSchema = new mongoose.Schema({
     ]
   }],
   isActive: {
+    type: Boolean,
+    default: true
+  },
+  isOpen: {
     type: Boolean,
     default: true
   },

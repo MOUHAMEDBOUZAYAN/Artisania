@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import api from '../services/api'
-import { MapPin, Phone, Mail, Clock, Star, ArrowLeft, Edit } from 'lucide-react'
+import api, { shopService } from '../services/api'
+import { MapPin, Phone, Mail, Star, ArrowLeft, Edit } from 'lucide-react'
+import ProductCard from '../components/ProductCard'
 
 const ShopDetail = () => {
   const { id } = useParams()
   const { user, isAuthenticated } = useAuth()
   const [shop, setShop] = useState(null)
+  const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [productsLoading, setProductsLoading] = useState(false)
   const [error, setError] = useState(null)
 
   useEffect(() => {
@@ -22,11 +25,29 @@ const ShopDetail = () => {
       setLoading(true)
       const response = await api.get(`/shops/${id}`)
       setShop(response.data.shop)
+      
+      // Fetch products after shop is loaded
+      await fetchProducts()
     } catch (err) {
       setError('Boutique non trouvée')
       console.error('Error fetching shop:', err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchProducts = async () => {
+    try {
+      setProductsLoading(true)
+      console.log('🛍️ Fetching products for shop:', id)
+      const response = await shopService.getShopProducts(id)
+      console.log('📦 Shop products response:', response.data)
+      setProducts(response.data.products || [])
+    } catch (err) {
+      console.error('Error fetching shop products:', err)
+      setProducts([])
+    } finally {
+      setProductsLoading(false)
     }
   }
 
@@ -172,18 +193,6 @@ const ShopDetail = () => {
             </div>
           </div>
 
-          {/* Working Hours */}
-          {shop.workingHours && (
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Horaires d'ouverture</h3>
-              <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5 text-gray-400" />
-                <span className="text-gray-700">
-                  {shop.workingHours.open} - {shop.workingHours.close}
-                </span>
-              </div>
-            </div>
-          )}
 
           {/* Categories */}
           {shop.categories && shop.categories.length > 0 && (
@@ -224,6 +233,40 @@ const ShopDetail = () => {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Products Section */}
+      <div className="mt-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">
+            Produits de cette boutique
+          </h2>
+          <span className="text-sm text-gray-500">
+            {products.length} produit{products.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+
+        {productsLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        ) : products.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-6xl mb-4">📦</div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Aucun produit disponible
+            </h3>
+            <p className="text-gray-500">
+              Cette boutique n'a pas encore de produits en vente.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )
