@@ -136,12 +136,30 @@ const Home = () => {
         <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
           Rejoignez la plateforme Artisania et partagez vos produits artisanaux avec les clients dans tout le Maroc
         </p>
-        <Link
-          to="/register"
-          className="bg-primary-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-600 transition-colors inline-block"
-        >
-          Commencer maintenant
-        </Link>
+        {isAuthenticated ? (
+          user?.role === 'seller' ? (
+            <Link
+              to="/dashboard"
+              className="bg-primary-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-600 transition-colors inline-block"
+            >
+              Accéder à votre tableau de bord
+            </Link>
+          ) : (
+            <Link
+              to="/login"
+              className="bg-primary-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-600 transition-colors inline-block"
+            >
+              Se connecter comme vendeur
+            </Link>
+          )
+        ) : (
+          <Link
+            to="/register"
+            className="bg-primary-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-600 transition-colors inline-block"
+          >
+            Commencer maintenant
+          </Link>
+        )}
       </section>
     </div>
   )
