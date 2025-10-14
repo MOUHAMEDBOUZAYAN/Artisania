@@ -1,5 +1,4 @@
 # Docker Compose pour Artisania (Frontend + Backend)
-version: '3.8'
 
 services:
   frontend:

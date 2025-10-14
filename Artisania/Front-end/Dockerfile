@@ -1,15 +1,29 @@
 # Dockerfile pour Artisania Frontend
-FROM node:24-alpine as build
+FROM node:18-alpine as build
 
 WORKDIR /app
 
+# Copy package files
 COPY package*.json ./
 
+# Install dependencies
+RUN npm ci
+
+# Copy source code
 COPY . .
 
+# Build the application
 RUN npm run build
 
+# Production stage
+FROM nginx:alpine
+
+# Copy built files to nginx
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copy nginx config
+COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 
-CMD ["npm", "run", "dev"]
+CMD ["nginx", "-g", "daemon off;"]

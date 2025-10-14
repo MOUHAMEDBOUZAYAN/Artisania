@@ -1,14 +1,18 @@
 # Dockerfile pour Artisania Backend
-FROM node:24-alpine
+FROM node:18-alpine
 
 WORKDIR /app
 
+# Copy package files
 COPY package*.json ./
 
-RUN npm ci --only=production
+# Install all dependencies (including devDependencies for build)
+RUN npm ci
 
+# Copy source code
 COPY . .
 
 EXPOSE 5001
 
-CMD ["nodemon", "server.js"]
+# Use node instead of nodemon for production
+CMD ["node", "server.js"]
